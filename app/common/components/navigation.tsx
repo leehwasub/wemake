@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Separator } from "./ui/separator";
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "./ui/navigation-menu";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "./ui/navigation-menu";
+import { cn } from "~/lib/utils";
 
 const menus = [
   {
@@ -120,23 +121,40 @@ export default function Navigation() {
       <Link to="/" className="font-bold tracking-tighter text-lg">
         WeMake
       </Link>
-      <Separator orientation="vertical" className="h-6 mx-4" />
+      <Separator orientation="vertical" className="!h-6 mx-4" />
       <NavigationMenu>
         <NavigationMenuList>
           {menus.map(menu => (
             <NavigationMenuItem key={menu.name}>
-              <NavigationMenuTrigger>
-                {menu.name}
-              </NavigationMenuTrigger>
+              {menu.items ? <>
+              <Link to={menu.to}>
+                <NavigationMenuTrigger>
+                  {menu.name}
+                </NavigationMenuTrigger>
+              </Link>
               <NavigationMenuContent>
-                {menu.items?.map(item => (
-                  <NavigationMenuItem key={item.name}>
-                    <NavigationMenuLink asChild>
-                      <Link to={item.to}>{item.name}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuContent>
+                <ul className="grid w-[600px] font-light gap-3 p-4 grid-cols-2">
+                  {menu.items?.map(item => (
+                    <NavigationMenuItem key={item.name} className={cn([
+                      "select-none rounded-md transition-colors focus:bg-accent hover:bg-accent",
+                      item.to === "/products/promote" && "col-span-2 bg-primary/10 hover:bg-primary/20 focus:bg-primary/20",
+                      item.to === "/jobs/submit" && "col-span-2 bg-primary/10 hover:bg-primary/20 focus:bg-primary/20",
+                    ])}>
+                      <NavigationMenuLink asChild>
+                        <Link 
+                        className="p-3 space-y-1 block leading-none no-underline outline-none"
+                        to={item.to}>
+                        <span className="text-sm font-medium leading-none">{item.name}</span>
+                        <p className="text-sm leading-none text-muted-foreground">
+                          {item.description}
+                        </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent></> : 
+              <Link className={navigationMenuTriggerStyle()}  to={menu.to}>{menu.name}</Link>}
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
