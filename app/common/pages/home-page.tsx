@@ -1,15 +1,46 @@
 import { Button } from "app/common/components/ui/button";
+import { Link } from "react-router";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { MessageCircleIcon } from "lucide-react";
+import { ProductCard } from "app/features/products/components/product-card";
+import type { MetaFunction } from "react-router";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Home | Wemake" },
+    { name: "description", content: "Welcome to wemake" },
+  ];
+};
 
 export default function HomePage() {
   return (
-    <main className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold mb-6">환영합니다!</h1>
-      <div className="space-y-4">
-        <p className="text-lg text-muted-foreground">
-          이곳에서 새로운 프로젝트를 시작하세요.
-        </p>
-        <Button>시작하기</Button>
+    <div className="px-20">
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <h2 className="text-5xl font-bold leading-tight tracking-tight">
+            Today's Product
+          </h2>
+          <p className="text-xl font-light text-foreground">
+            The best products made by our community today.
+          </p>
+        </div>
+        {Array.from({ length: 10 }).map((_, index) => (
+          <ProductCard
+            key={index}
+            productId={`productId-${index}`}
+            productName={`Product Name ${index}`}
+            productDescription={`Product Description ${index}`}
+            messageCount={12}
+            viewCount={12}
+            upvoteCount={120}
+          />
+        ))}
       </div>
-    </main>
+    </div>
   );
 }
