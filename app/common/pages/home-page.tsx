@@ -14,6 +14,8 @@ import type { MetaFunction } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { PostCard } from "app/features/community/components/post-card";
 import { IdeaCard } from "app/features/ideas/components/idea-card";
+import { Badge } from "../components/ui/badge";
+import { JobCard } from "app/features/jobs/components/job-card";
 
 export const meta: MetaFunction = () => {
   return [
@@ -95,6 +97,33 @@ export default function HomePage() {
           timeAgo="12 hours ago"
           likeCount={123}
           claimed={index % 2 === 0}
+          />
+        ))}
+      </div>
+      <div className="grid grid-cols-4 gap-4">
+        <div>
+          <h2 className="text-5xl font-bold leading-tight tracking-tight">
+            Latest Jobs
+          </h2>
+          <p className="text-xl font-light text-foreground">
+            Find your dream job.
+          </p>
+          <Button variant="link" asChild className="text-lg p-0">
+            <Link to="/jobs">Explore all jobs &rarr;</Link>
+          </Button>
+        </div>
+        {Array.from({ length: 10 }).map((_, index) => (
+          <JobCard
+            key={index}
+            jobId="jobId"
+            companyLogo="https://github.com/facebook.png"
+            companyName="Tesla"
+            timeAgo="12 hours ago"
+            jobTitle="Full Stack Engineer"
+            salaryRange="$100,000 - $120,000"
+            type="Full-time" 
+            location="Remote"
+            compnayHq="San Francisco, CA"
           />
         ))}
       </div>
