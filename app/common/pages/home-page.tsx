@@ -25,6 +25,13 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+//run on server side before HomePage is rendered
+export const loader = () => {
+  return {
+    
+  };
+};
+
 export default function HomePage() {
   return (
     <div className="px-20 space-y-40">
