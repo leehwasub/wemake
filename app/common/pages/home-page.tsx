@@ -26,15 +26,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-//run on server side before HomePage is rendered
-export const loader = () => {
-  return {
-    hello: "World",
-    hello2: 12344,
-  };
-};
-
-export default function HomePage({loaderData} : Route.ComponentProps) {
+export default function HomePage() {
   return (
     <div className="px-20 space-y-40">
       <div className="grid grid-cols-3 gap-4">
