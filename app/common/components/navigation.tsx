@@ -21,7 +21,7 @@ const menus = [
       {
         name:"Categories",
         description:"See the top performers in your community",
-        to:"/products/cat"
+        to:"/products/categories"
       },
       {
         name:"Search",
