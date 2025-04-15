@@ -17,6 +17,7 @@ import { IdeaCard } from "app/features/ideas/components/idea-card";
 import { Badge } from "../components/ui/badge";
 import { JobCard } from "app/features/jobs/components/job-card";
 import { TeamCard } from "app/features/teams/components/team-card";
+import type { Route } from "./+types/home-page";
 
 export const meta: MetaFunction = () => {
   return [
@@ -28,11 +29,12 @@ export const meta: MetaFunction = () => {
 //run on server side before HomePage is rendered
 export const loader = () => {
   return {
-    
+    hello: "World",
+    hello2: 12344,
   };
 };
 
-export default function HomePage() {
+export default function HomePage({loaderData} : Route.ComponentProps) {
   return (
     <div className="px-20 space-y-40">
       <div className="grid grid-cols-3 gap-4">
