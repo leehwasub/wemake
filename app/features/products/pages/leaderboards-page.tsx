@@ -3,6 +3,7 @@ import { ProductCard } from "../components/product-card";
 import type { Route } from "./+types/leaderboards-page";
 import { Hero } from "~/common/components/hero";
 import { Link } from "react-router";
+import { DateTime } from "luxon";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -11,8 +12,9 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
+
 export default function LeaderboardsPage() {
-  return (
+  return (  
     <div className="space-y-20">
       <Hero
         title="Leaderboard"
