@@ -1,7 +1,11 @@
 import { DateTime } from "luxon";
 import type { Route } from "./+types/daily-leaderboards-page";
-import { data, isRouteErrorResponse, useLoaderData } from "react-router";
+import { data, isRouteErrorResponse, Link, useLoaderData } from "react-router";
 import { z } from "zod";
+import { Hero } from "~/common/components/hero";
+import { ProductCard } from "../components/product-card";
+import { Button } from "~/common/components/ui/button";
+import { ProductPagination } from "~/common/components/product-pagination";
 
 const paramsSchema = z.object({
   year: z.coerce.number(),
@@ -52,10 +56,49 @@ export const loader = ({params} : Route.LoaderArgs) => {
 
 export default function DailyLeaderboardsPage({loaderData} : Route.ComponentProps) {
   const {params} = loaderData;
+  const urlDate = DateTime.fromObject({ 
+    year: Number(params?.year,), 
+    month: Number(params?.month), 
+    day: Number(params?.day)
+  });
+  const previousDay = urlDate.minus({ days: 1 });
+  const nextDay = urlDate.plus({ days: 1 });
+  const isToday = urlDate.equals(DateTime.now().startOf("day"));
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold">{params.year}년 {params.month}월 {params.day}일 일간 리더보드</h1>
-    </div>  
+    <div className="space-y-10">
+      <Hero
+        title={`The best of ${urlDate.toLocaleString(DateTime.DATETIME_MED)}`}
+        subtitle=""
+      />
+      <div className="flex items-center justify-center gap-2">
+        <Button variant="secondary" asChild>
+          <Link to={`/products/leaderboards/daily/${previousDay.year}/${previousDay.month}/${previousDay.day}`}>
+            &larr; {previousDay.toLocaleString(DateTime.DATE_SHORT)}
+          </Link>
+        </Button>
+        {!isToday &&
+          <Button variant="secondary" asChild>
+            <Link to={`/products/leaderboards/daily/${nextDay.year}/${nextDay.month}/${nextDay.day}`}>
+              {nextDay.toLocaleString(DateTime.DATE_SHORT)} &rarr;
+            </Link> 
+          </Button>
+        }
+      </div>
+      <div className="space-y-5 w-full max-w-screen-md mx-auto">
+        {Array.from({ length: 10 }).map((_, index) => (
+          <ProductCard
+            key={index}
+            productId={`productId-${index}`}
+            productName={`Product Name ${index}`}
+            productDescription={`Product Description ${index}`}
+            messageCount={12}
+            viewCount={12}
+            upvoteCount={120}
+          />
+        ))}
+      </div>
+      <ProductPagination totalPages={10} />
+    </div>
   );
 } 
 
