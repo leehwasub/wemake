@@ -7,7 +7,7 @@ type ProductPaginationProps = {
 
 export function ProductPagination({totalPages} : ProductPaginationProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const page = Number(searchParams.get("page")) ?? "1";
+  const page = Number(searchParams.get("page") ?? 1);
   const isFirstPage = page === 1;
   const isLastPage = page === totalPages;
   const getUrlWithPage = (page: number) => {

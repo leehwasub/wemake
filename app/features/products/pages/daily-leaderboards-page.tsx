@@ -27,7 +27,7 @@ export const loader = ({params} : Route.LoaderArgs) => {
       }
     )
   }
-  const date = DateTime.fromObject({ year: parsedData?.year, month: parsedData?.month, day: parsedData?.day }).setZone("Asia/Seoul");
+  const date = DateTime.fromObject(parsedData).setZone("Asia/Seoul");
   if (!date.isValid) {
     throw data(
       {
