@@ -11,6 +11,18 @@ const paramsSchema = z.object({
   year: z.coerce.number(),
 });
 
+export const meta : Route.MetaFunction = ({params}) => {
+  const date = DateTime.fromObject({
+    year: Number(params.year),
+  });
+  return [
+    {title: `Best of year ${date.toLocaleString({
+          year: "numeric",
+        })} | wemake`},
+  ]
+}
+
+
 export const loader = ({params} : Route.LoaderArgs) => {
   const { success, data: parsedData } = paramsSchema.safeParse(params);
   if (!success)
@@ -44,7 +56,7 @@ export const loader = ({params} : Route.LoaderArgs) => {
     throw data(
       {
         message: "future_date",
-        error_code: "Future date",
+        error_code: "Future date", 
       },
       {
         status: 400,

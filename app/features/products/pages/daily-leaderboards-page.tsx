@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import type { Route } from "./+types/daily-leaderboards-page";
-import { data, isRouteErrorResponse, Link, useLoaderData } from "react-router";
-import { z } from "zod";
+import { data, isRouteErrorResponse, Link, useLoaderData, type MetaFunction } from "react-router";
+import { date, z } from "zod";
 import { Hero } from "~/common/components/hero";
 import { ProductCard } from "../components/product-card";
 import { Button } from "~/common/components/ui/button";
@@ -12,6 +12,17 @@ const paramsSchema = z.object({
   month: z.coerce.number(),
   day: z.coerce.number(),
 });
+
+export const meta : Route.MetaFunction = ({params}) => {
+  const date = DateTime.fromObject({
+    year: Number(params.year),
+    month: Number(params.month),
+    day: Number(params.day),
+  });
+  return [
+    {title: `The best of ${date.toLocaleString(DateTime.DATETIME_MED)} | wemake`},
+  ]
+}
 
 export const loader = ({params} : Route.LoaderArgs) => {
   const { success, data: parsedData } = paramsSchema.safeParse(params);
