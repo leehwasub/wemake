@@ -4,7 +4,7 @@ import { useState, type InputHTMLAttributes } from "react";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
-export default function InputPair({
+export default function SelectPair({
   name, 
   required, 
   label, 
