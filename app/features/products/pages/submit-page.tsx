@@ -6,6 +6,8 @@ import { Label } from "@radix-ui/react-label";
 import InputPair from "~/common/components/input-pair";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/common/components/ui/select";
 import SelectPair from "~/common/components/select-pair";
+import { useState } from "react";
+import { Button } from "~/common/components/ui/button";
 
 export const meta : Route.MetaFunction = () => {
   return [
@@ -16,6 +18,13 @@ export const meta : Route.MetaFunction = () => {
 
 
 export default function SubmitPage({loaderData} : Route.ComponentProps) {
+  const [icon, setIcon] = useState<string | null>(null);
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setIcon(URL.createObjectURL(file));
+    }
+  }
   return (
     <div className="space-y-10">
       <Hero 
@@ -59,6 +68,7 @@ export default function SubmitPage({loaderData} : Route.ComponentProps) {
           />
           <SelectPair 
             name="category"
+
             required
             label="Category"
             description="The category of your product."
@@ -71,6 +81,29 @@ export default function SubmitPage({loaderData} : Route.ComponentProps) {
               {label: "Other", value: "other"},
             ]}
           />
+          <Button type="submit" className="w-full" size="lg">Submit</Button>
+        </div>
+        <div className="flex flex-col space-y-2">
+          <Label className="flex flex-col">Icon
+            <small className="text-muted-foreground">
+              The icon of your product.
+            </small>
+          </Label>
+          <Input type="file" className="max-w-1/2" name="icon" onChange={onChange} required/>
+          <div className="flex flex-col text-xs">
+            <span className="text-muted-foreground">
+              Recommanded size: 128x128px
+            </span>
+            <span className="text-muted-foreground">
+              Allowed formats: PNG, JPEG
+            </span>
+            <span className="text-muted-foreground">
+              Max file size: 1MB
+            </span>
+          </div>
+          <div className="size-40 rounded-xl shadow-xl border border-dashed border-border overflow-hidden">
+            {icon && <img src={icon} alt="icon" className="w-full h-full object-cover"/> }
+          </div>
         </div>
       </Form>
     </div>
