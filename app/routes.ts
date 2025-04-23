@@ -29,14 +29,28 @@ export default [
       ]),
     ]),
   ]),
-  ...prefix("ideas", [
+  ...prefix("/ideas", [
     index("features/ideas/pages/ideas-page.tsx"),
     route("/:ideaId", "features/ideas/pages/idea-page.tsx"),
   ]),
-  ...prefix("jobs", [
+  ...prefix("/jobs", [
     index("features/jobs/pages/jobs-page.tsx"),
     route("/:jobId", "features/jobs/pages/job-page.tsx"),
     route("/submit", "features/jobs/pages/submit-job-page.tsx"),
+  ]),
+  ...prefix("/auth", [
+    layout("features/auth/layouts/auth-layout.tsx", [
+      route("/login", "features/auth/pages/login-page.tsx"),
+      route("/join", "features/auth/pages/join-page.tsx"),
+      ...prefix("/otp", [
+        route("/start", "features/auth/pages/otp-start-page.tsx"),
+        route("/complete", "features/auth/pages/otp-page.tsx"),
+      ]),
+      ...prefix("/social/:provider", [
+        route("/start", "features/auth/pages/social-start-page.tsx"),
+        route("/complete", "features/auth/pages/social-complete-page.tsx"),
+      ]),
+    ]),
   ]),
 ] satisfies RouteConfig;
 
