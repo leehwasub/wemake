@@ -1,6 +1,7 @@
 import { Form, Link } from "react-router";
 import InputPair from "~/common/components/input-pair";
 import { Button } from "~/common/components/ui/button";
+import AuthButtons from "../components/auth-buttons";
 
 
 export default function LoginPage() {
@@ -32,6 +33,7 @@ export default function LoginPage() {
           />
           <Button type="submit" className="w-full">Create account</Button>
         </Form>
+        <AuthButtons />
       </div>
     </div>
     );
