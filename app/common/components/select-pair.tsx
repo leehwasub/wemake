@@ -6,14 +6,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 
 export default function SelectPair({
   name, 
-  required, 
+  required = false, 
   label, 
   description, 
   placeholder,
   options,
 } : {
   name: string,
-  required: boolean,
+  required?: boolean,
   label: string, 
   description: string,
   placeholder: string,
