@@ -38,9 +38,9 @@ export default function SubmitTeamPage() {
           placeholder="Select a stage" 
           options={[
             { label: "Idea", value: "idea" },
+            { label: "Prototype", value: "prototype" },
             { label: "MVP", value: "mvp" },
-            { label: "Growth", value: "growth" },
-            { label: "Mature", value: "mature" },
+            { label: "Product", value: "product" },
           ]} 
           required
         />
