@@ -7,7 +7,7 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function MessagePage() {
+export default function MessagesPage() {
   return (
     <div className="h-full w-full flex flex-col items-center justify-center">
       <MessageCircleIcon className="size-12 text-muted-foreground"/>
