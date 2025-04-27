@@ -1,5 +1,5 @@
 import { Hero } from "~/common/components/hero";
-import type { Route } from "./+types/submit-page";
+import type { Route } from "./+types/submit-product-page";
 import { Form } from "react-router";
 import { Input } from "~/common/components/ui/input";
 import { Label } from "@radix-ui/react-label";
