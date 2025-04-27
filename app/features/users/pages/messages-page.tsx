@@ -1,3 +1,4 @@
+import { MessageCircleIcon } from "lucide-react";
 import type { Route } from "./+types/messages-page";
 
 export const meta: Route.MetaFunction = () => {
@@ -7,5 +8,12 @@ export const meta: Route.MetaFunction = () => {
 };
 
 export default function MessagePage() {
-  return <div>Message Page</div>;
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center">
+      <MessageCircleIcon className="size-12 text-muted-foreground"/>
+      <div className="text-xl text-muted-foreground font-semibold">
+        Click on a message to start chatting
+      </div>
+    </div>
+  );
 } 
