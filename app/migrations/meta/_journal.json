@@ -36,6 +36,20 @@
       "when": 1745834525707,
       "tag": "0004_lush_aaron_stack",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1745835574310,
+      "tag": "0005_fine_caretaker",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1745836580107,
+      "tag": "0006_eager_ultimo",
+      "breakpoints": true
     }
   ]
 }

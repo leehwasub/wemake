@@ -5,6 +5,7 @@ import { Form } from 'react-router';
 import InputPair from '~/common/components/input-pair';
 import { Button } from '~/common/components/ui/button';
 import SelectPair from '~/common/components/select-pair';
+import { PRODUCT_STAGES } from '../constants';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -36,12 +37,7 @@ export default function SubmitTeamPage() {
           label="What is the stage of your product?" 
           description="Select the stage of your product" 
           placeholder="Select a stage" 
-          options={[
-            { label: "Idea", value: "idea" },
-            { label: "Prototype", value: "prototype" },
-            { label: "MVP", value: "mvp" },
-            { label: "Product", value: "product" },
-          ]} 
+          options={PRODUCT_STAGES} 
           required
         />
         <InputPair 
