@@ -22,6 +22,6 @@ export const jobs = pgTable("jobs", {
   job_type: jobTypes().notNull(),
   location: locations().notNull(),
   salary_range: salaryRanges().notNull(),
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  created_at: timestamp().notNull().defaultNow(),
+  updated_at: timestamp().notNull().defaultNow(),
 });
