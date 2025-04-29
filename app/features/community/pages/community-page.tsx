@@ -11,11 +11,13 @@ import { PostCard } from '../components/post-card';
 import { getPosts, getTopics } from '../queries';
 import type { Route } from './+types/community-page';
 
-export const loader = async() => {
+
+export const clientLoader = async() => {
   //await new Promise(resolve => setTimeout(resolve, 1000));
   // const topics = await getTopics();
   // const posts = await getPosts();
   // const [topics, posts] = await Promise.all([getTopics(), getPosts()]);
+  //const serverData = await serverLoader();
   const topics = await getTopics();
   const posts = await getPosts();
   return { topics, posts };
@@ -135,3 +137,11 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
     </div>
   );
 } 
+
+export function HydrateFallback() {
+  return (
+    <div>
+      <div>Loading...</div>
+    </div>
+  );
+}
