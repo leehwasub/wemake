@@ -90,13 +90,13 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
             {loaderData.posts?.map((post) => (
               <PostCard
                 key={post.post_id}
-                postId={post.post_id!}
+                postId={post.post_id}
                 avatarSrc={post.author_avatar}  
-                title={post.title!}
-                author={post.author!}
-                category={post.topic!}
-                timeAgo={post.created_at!}
-                votesCount={post.upvotes!}
+                title={post.title}
+                author={post.author}
+                category={post.topic}
+                timeAgo={post.created_at}
+                votesCount={post.upvotes}
                 expanded={true}
               />
             ))}
