@@ -19,6 +19,7 @@ import { JobCard } from "app/features/jobs/components/job-card";
 import { TeamCard } from "app/features/teams/components/team-card";
 import type { Route } from "./+types/home-page";
 import { DateTime } from "luxon";
+import { getProductsByDataRange } from "~/features/products/queries";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,7 +28,16 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function HomePage() {
+export const loader = async () => {
+  const products = await getProductsByDataRange({
+    startDate: DateTime.now().startOf("day"),
+    endDate: DateTime.now().endOf("day"),
+    limit: 7,
+  });
+  return { products };
+};
+
+export default function HomePage({loaderData}: Route.ComponentProps) {
   return (
     <div className="px-20 space-y-40">
       <div className="grid grid-cols-3 gap-4">
@@ -42,15 +52,15 @@ export default function HomePage() {
             <Link to="/products/leaderboards">Explore all products &rarr;</Link>
           </Button>
         </div>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {loaderData.products.map((product) => (
           <ProductCard
-            key={index}
-            productId={`productId-${index}`}
-            productName={`Product Name ${index}`}
-            productDescription={`Product Description ${index}`}
-            messageCount={12}
-            viewCount={12}
-            upvoteCount={120}
+            key={product.product_id}
+            productId={product.product_id.toString()}
+            productName={product.name}
+            productDescription={product.description}
+            reviewsCount={product.reviews}
+            viewsCount={product.views}
+            upvotesCount={product.upvotes}
           />
         ))}
       </div>
@@ -69,7 +79,7 @@ export default function HomePage() {
         {Array.from({ length: 10 }).map((_, index) => (
           <PostCard
             key={index}
-            postId={`postId-${index}`}
+            postId={index}
             avatarSrc="https://github.com/shadcn.png"
             title="What is the best productivity tool?"
             author="Nico On"

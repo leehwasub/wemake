@@ -12,7 +12,7 @@ import { getPosts, getTopics } from '../queries';
 import type { Route } from './+types/community-page';
 
 
-export const clientLoader = async() => {
+export const loader = async() => {
   //await new Promise(resolve => setTimeout(resolve, 1000));
   // const topics = await getTopics();
   // const posts = await getPosts();

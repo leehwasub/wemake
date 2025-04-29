@@ -57,6 +57,13 @@
       "when": 1745917989515,
       "tag": "0007_lush_masked_marvel",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1745931511452,
+      "tag": "0008_remarkable_amphibian",
+      "breakpoints": true
     }
   ]
 }
