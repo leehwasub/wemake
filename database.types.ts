@@ -308,6 +308,13 @@ export type Database = {
             foreignKeyName: "notifications_post_id_posts_post_id_fk"
             columns: ["post_id"]
             isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
             referencedRelation: "posts"
             referencedColumns: ["post_id"]
           },
@@ -369,6 +376,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "post_replies"
             referencedColumns: ["post_reply_id"]
+          },
+          {
+            foreignKeyName: "post_replies_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
           },
           {
             foreignKeyName: "post_replies_post_id_posts_post_id_fk"
@@ -445,6 +459,13 @@ export type Database = {
           profile_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "posts_upvotes_post_id_posts_post_id_fk"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_post_list_view"
+            referencedColumns: ["post_id"]
+          },
           {
             foreignKeyName: "posts_upvotes_post_id_posts_post_id_fk"
             columns: ["post_id"]
@@ -697,7 +718,19 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      community_post_list_view: {
+        Row: {
+          author: string | null
+          author_avatar: string | null
+          author_username: string | null
+          created_at: string | null
+          post_id: number | null
+          title: string | null
+          topic: string | null
+          upvotes: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
