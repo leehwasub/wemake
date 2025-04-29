@@ -1,7 +1,7 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { ChevronDownIcon } from 'lucide-react';
-import React from 'react';
-import { Form, Link, useSearchParams } from 'react-router';
+import React, { Suspense } from 'react';
+import { Await, data, Form, Link, useSearchParams } from 'react-router';
 import { Hero } from '~/common/components/hero';
 import { Button } from '~/common/components/ui/button';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem } from '~/common/components/ui/dropdown-menu';
@@ -12,12 +12,17 @@ import { getPosts, getTopics } from '../queries';
 import type { Route } from './+types/community-page';
 
 export const loader = async() => {
-  const topics = await getTopics();
-  const posts = await getPosts();
+  //await new Promise(resolve => setTimeout(resolve, 1000));
+  // const topics = await getTopics();
+  // const posts = await getPosts();
+  // const [topics, posts] = await Promise.all([getTopics(), getPosts()]);
+  const topics = getTopics();
+  const posts = getPosts();
   return { topics, posts };
 }
 
 export default function CommunityPage({loaderData} : Route.ComponentProps) {
+  const {topics, posts} = loaderData;
   const [searchParams, setSearchParams] = useSearchParams();
   const sorting = searchParams.get("sort") || "newest";
   const period = searchParams.get("period") || "all";
@@ -86,33 +91,45 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
               <Link to="/community/submit">Create Discussion</Link>
             </Button>
           </div>
-          <div className="space-y-5">
-            {loaderData.posts?.map((post) => (
-              <PostCard
-                key={post.post_id}
-                postId={post.post_id}
-                avatarSrc={post.author_avatar}  
-                title={post.title}
-                author={post.author}
-                category={post.topic}
-                timeAgo={post.created_at}
-                votesCount={post.upvotes}
-                expanded={true}
-              />
-            ))}
-          </div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Await resolve={posts}>
+              {(data) => (
+                <div className="space-y-5">
+                {data?.map((post) => (
+                  <PostCard
+                    key={post.post_id}
+                    postId={post.post_id}
+                    avatarSrc={post.author_avatar}  
+                    title={post.title}
+                    author={post.author}
+                    category={post.topic}
+                    timeAgo={post.created_at}
+                    votesCount={post.upvotes}
+                    expanded={true}
+                  />
+                ))}
+              </div>
+              )}
+            </Await>
+          </Suspense>
         </div>
         <aside className="col-span-2 space-y-5">
           <span className="text-sm font-bold text-muted-foreground uppercase">Topics</span>
-          <div className="flex flex-col gap-4 items-start">
-            {loaderData.topics?.map((topic) => (
-              <Button asChild variant={"link"} key={topic.slug} className="pl-0">
-                <Link to={`/community?topic=${topic.slug}`} className="font-semibold">
-                  {topic.name}
-                </Link>
-              </Button>
-            ))}
-          </div>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Await resolve={topics}>
+                {(data) => (
+                <div className="flex flex-col gap-4 items-start">
+                  {data?.map((topic) => (
+                    <Button asChild variant={"link"} key={topic.slug} className="pl-0">
+                      <Link to={`/community?topic=${topic.slug}`} className="font-semibold">
+                      {topic.name}
+                    </Link>
+                  </Button>
+                  ))}
+                </div>
+                )}
+              </Await>
+            </Suspense>
         </aside>
       </div>
     </div>
