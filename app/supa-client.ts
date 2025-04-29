@@ -13,8 +13,8 @@ type Database = MergeDeep<SupabaseDatabase, {
 }>
 
 const client = createClient<Database>(
-    "https://mdflhytbhojhpwcfkwoa.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kZmxoeXRiaG9qaHB3Y2Zrd29hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU3NzI2ODcsImV4cCI6MjA2MTM0ODY4N30.cxp3jvZPuuyAwjgy70t7B6vgqMhcHN7DHwM16f3Rae8"
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 export default client;
