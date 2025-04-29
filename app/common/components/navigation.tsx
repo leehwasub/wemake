@@ -132,7 +132,7 @@ export default function Navigation({isLoggedIn, hasNotifications, hasMessages}:{
           {menus.map(menu => (
             <NavigationMenuItem key={menu.name}>
               {menu.items ? <>
-              <Link to={menu.to}>
+              <Link to={menu.to} prefetch="render">
                 <NavigationMenuTrigger>
                   {menu.name}
                 </NavigationMenuTrigger>

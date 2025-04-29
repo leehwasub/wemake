@@ -3,7 +3,7 @@ import { ChevronDownIcon } from 'lucide-react';
 import React, { Suspense } from 'react';
 import { Await, data, Form, Link, useSearchParams } from 'react-router';
 import { Hero } from '~/common/components/hero';
-import { Button } from '~/common/components/ui/button';
+import { Button } from '~/common/components/ui/button'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem } from '~/common/components/ui/dropdown-menu';
 import { PERIOD_OPTIONS, SORT_OPTIONS } from '../constants';
 import { Input } from '~/common/components/ui/input';
@@ -16,8 +16,8 @@ export const loader = async() => {
   // const topics = await getTopics();
   // const posts = await getPosts();
   // const [topics, posts] = await Promise.all([getTopics(), getPosts()]);
-  const topics = getTopics();
-  const posts = getPosts();
+  const topics = await getTopics();
+  const posts = await getPosts();
   return { topics, posts };
 }
 
