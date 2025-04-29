@@ -1,3 +1,4 @@
+/*
 import db from "~/db"
 import { posts, postsUpvotes, topics } from "./schema";
 import { count, desc, eq } from "drizzle-orm";
@@ -29,3 +30,36 @@ export const getPosts = async() => {
   .orderBy(desc(posts.post_id));
   return allPosts;
 }
+*/
+
+import client from "~/supa-client"
+
+export const getTopics = async() => {
+  const { data, error } = await client.from("topics").select("name, slug");
+  console.log(data, error);
+  return data;
+}
+
+export const getPosts = async() => {
+  const { data, error } = await client.from("posts").select(`
+    post_id, 
+    title, 
+    created_at,
+    topic:topics!inner (
+      name
+    ),
+    author:profiles!posts_profile_id_profiles_profile_id_fk!inner (
+      name,
+      avatar,
+      username
+    ),
+    upvotes:posts_upvotes(
+      count
+    )
+  `);
+  console.log(error);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+

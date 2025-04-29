@@ -89,14 +89,14 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
           <div className="space-y-5">
             {loaderData.posts.map((post) => (
               <PostCard
-                key={post.id}
-                postId={post.id}
-                avatarSrc={post.authorAvatarUrl}  
+                key={post.post_id}
+                postId={post.post_id}
+                avatarSrc={post.author.avatar}  
                 title={post.title}
-                author={post.author}
-                category={post.topics}
-                timeAgo={post.createdAt}
-                votesCount={post.upvotes}
+                author={post.author.name}
+                category={post.topic.name}
+                timeAgo={post.created_at}
+                votesCount={post.upvotes[0].count}
                 expanded={true}
               />
             ))}
@@ -105,7 +105,7 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
         <aside className="col-span-2 space-y-5">
           <span className="text-sm font-bold text-muted-foreground uppercase">Topics</span>
           <div className="flex flex-col gap-4 items-start">
-            {loaderData.topics.map((topic) => (
+            {loaderData.topics?.map((topic) => (
               <Button asChild variant={"link"} key={topic.slug} className="pl-0">
                 <Link to={`/community?topic=${topic.slug}`} className="font-semibold">
                   {topic.name}
