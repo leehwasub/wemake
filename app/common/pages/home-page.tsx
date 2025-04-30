@@ -20,6 +20,7 @@ import { TeamCard } from "app/features/teams/components/team-card";
 import type { Route } from "./+types/home-page";
 import { DateTime } from "luxon";
 import { getProductsByDataRange } from "~/features/products/queries";
+import { getPosts } from "~/features/community/queries";
 
 export const meta: MetaFunction = () => {
   return [
@@ -34,7 +35,11 @@ export const loader = async () => {
     endDate: DateTime.now().endOf("day"),
     limit: 7,
   });
-  return { products };
+  const posts = await getPosts({  
+    limit: 7,
+    sorting: "newest",
+  });
+  return { products, posts };
 };
 
 export default function HomePage({loaderData}: Route.ComponentProps) {
@@ -76,15 +81,15 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/community">Explore all Discussions &rarr;</Link>
           </Button>
         </div>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {loaderData.posts?.map((post) => (
           <PostCard
-            key={index}
-            postId={index}
-            avatarSrc="https://github.com/shadcn.png"
-            title="What is the best productivity tool?"
-            author="Nico On"
-            category="Productivity"
-            timeAgo="12 hours ago"
+            key={post.post_id}
+            postId={post.post_id}
+            avatarSrc={post.author_avatar}
+            title={post.title}
+            author={post.author}
+            category={post.topic}
+            timeAgo={post.created_at}
           />
         ))}
       </div>

@@ -10,16 +10,42 @@ import { Input } from '~/common/components/ui/input';
 import { PostCard } from '../components/post-card';
 import { getPosts, getTopics } from '../queries';
 import type { Route } from './+types/community-page';
+import { z } from 'zod';
 
+const searchParamsSchema = z.object({
+  sort: z.enum(["newest", "popular"]).optional().default("newest"),
+  period: z.enum(["all", "today", "week", "month", "year"]).optional().default("all"),
+  keyword: z.string().optional(),
+  topic: z.string().optional(),
+});
 
-export const loader = async() => {
+export const loader = async({request} : Route.LoaderArgs) => {
   //await new Promise(resolve => setTimeout(resolve, 1000));
   // const topics = await getTopics();
   // const posts = await getPosts();
   // const [topics, posts] = await Promise.all([getTopics(), getPosts()]);
   //const serverData = await serverLoader();
+  const url = new URL(request.url);
+  const {success, data: parsedData} = searchParamsSchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!success) {
+    throw data(
+      {
+        message: "Invalid search params",
+        error_code: "Invalid search params",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
   const topics = await getTopics();
-  const posts = await getPosts();
+  const posts = await getPosts({
+    limit: 20,
+    sorting: parsedData.sort,
+    period: parsedData.period,
+    keyword: parsedData.keyword,
+    topic: parsedData.topic,
+  });
   return { topics, posts };
 }
 
@@ -86,7 +112,7 @@ export default function CommunityPage({loaderData} : Route.ComponentProps) {
                 }
               </div>
               <Form className="w-2/3">
-                <Input type="text" name="search" placeholder="Search for discussions" />
+                <Input type="text" name="keyword" placeholder="Search for discussions" />
               </Form>
             </div>
             <Button asChild>
