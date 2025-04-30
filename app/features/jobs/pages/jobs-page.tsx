@@ -3,8 +3,10 @@ import type { Route } from "./+types/jobs-page";
 import { JobCard } from "../components/job-card";
 import { Button } from "~/common/components/ui/button";
 import { JOB_TYPES, LOCATION_TYPES, SALARY_RNAGE } from "../constants";
-import { Link, useSearchParams } from "react-router";
+import { data, Link, useSearchParams } from "react-router";
 import { cn } from "~/lib/utils";
+import { getJobs } from "../queries";
+import { z } from "zod";
 
 export const meta : Route.MetaFunction = () => {
   return [
@@ -13,7 +15,36 @@ export const meta : Route.MetaFunction = () => {
   ]
 }
 
-export default function JobsPage() {
+const searchParamsSchema = z.object({
+  type: z.enum(JOB_TYPES.map((jobType) => jobType.value) as [string, ...string[]]).optional(),
+  location: z.enum(LOCATION_TYPES.map((locationType) => locationType.value) as [string, ...string[]]).optional(),
+  salary: z.enum(SALARY_RNAGE).optional(),
+});
+
+export const loader = async ({request} : Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const {success, data: parsedData} = searchParamsSchema.safeParse(Object.fromEntries(url.searchParams));
+  if (!success) {
+    throw data(
+      {
+        message: "Invalid search params",
+        error_code: "INVALID_SEARCH_PARAMS",
+      },
+      {
+        status: 400,
+      }
+    );
+  }
+  const jobs = await getJobs({
+    limit: 40,
+    location: parsedData.location,
+    type: parsedData.type,
+    salary: parsedData.salary,
+  });
+  return { jobs };
+}
+
+export default function JobsPage({loaderData} : Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const onFilterClick = (key: string, value: string) => {
     searchParams.set(key, value);
@@ -24,18 +55,18 @@ export default function JobsPage() {
       <Hero title="Jobs" subtitle="Find jobs for your next project"/>
       <div className="grid grid-cols-1 xl:grid-cols-6 gap-20 items-start">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:col-span-4 gap-5">
-          {Array.from({ length: 20 }).map((_, index) => (
+          {loaderData.jobs?.map((job) => (
             <JobCard
-              key={index}
-              jobId="jobId"
-              companyLogo="https://github.com/facebook.png"
-              companyName="Tesla"
-              timeAgo="12 hours ago"
-              jobTitle="Full Stack Engineer"
-              salaryRange="$100,000 - $120,000"
-              type="Full-time" 
-              location="Remote"
-              compnayHq="San Francisco, CA"
+              key={job.job_id}
+              jobId={job.job_id}
+              companyLogo={job.company_logo}
+              companyName={job.company_name}
+              timeAgo={job.created_at}
+              jobTitle={job.position}
+              salaryRange={job.salary_range}
+              type={job.job_type} 
+              location={job.location}
+              compnayHq={job.company_location}
             />
           ))}
         </div>

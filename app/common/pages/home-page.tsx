@@ -22,6 +22,7 @@ import { DateTime } from "luxon";
 import { getProductsByDataRange } from "~/features/products/queries";
 import { getPosts } from "~/features/community/queries";
 import { getGptIdeas } from "~/features/ideas/queries";
+import { getJobs } from "~/features/jobs/queries";
 
 export const meta: MetaFunction = () => {
   return [
@@ -43,7 +44,10 @@ export const loader = async () => {
   const ideas = await getGptIdeas({
     limit: 7,
   });
-  return { products, posts, ideas };
+  const jobs = await getJobs({
+    limit: 11,
+  });
+  return { products, posts, ideas, jobs };
 };
 
 export default function HomePage({loaderData}: Route.ComponentProps) {
@@ -132,18 +136,18 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/jobs">Explore all jobs &rarr;</Link>
           </Button>
         </div>
-        {Array.from({ length: 10 }).map((_, index) => (
+        {loaderData.jobs?.map((job) => (
           <JobCard
-            key={index}
-            jobId="jobId"
-            companyLogo="https://github.com/facebook.png"
-            companyName="Tesla"
-            timeAgo="12 hours ago"
-            jobTitle="Full Stack Engineer"
-            salaryRange="$100,000 - $120,000"
-            type="Full-time" 
-            location="Remote"
-            compnayHq="San Francisco, CA"
+            key={job.job_id}
+            jobId={job.job_id}
+            companyLogo={job.company_logo}
+            companyName={job.company_name}
+            timeAgo={job.created_at}
+            jobTitle={job.position}
+            salaryRange={job.salary_range}
+            type={job.job_type} 
+            location={job.location}
+            compnayHq={job.company_location}
           />
         ))}
       </div>
