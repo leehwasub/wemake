@@ -6,7 +6,8 @@ import { Hero } from "~/common/components/hero";
 import { ProductCard } from "../components/product-card";
 import { Button } from "~/common/components/ui/button";
 import { ProductPagination } from "~/common/components/product-pagination";
-
+import { getProductPagesByDataRange, getProductsByDataRange } from "../queries";
+import { PAGE_SIZE } from "../contants";
 const paramsSchema = z.object({
   year: z.coerce.number(),
 });
@@ -23,7 +24,7 @@ export const meta : Route.MetaFunction = ({params}) => {
 }
 
 
-export const loader = ({params} : Route.LoaderArgs) => {
+export const loader = async ({params, request} : Route.LoaderArgs) => {
   const { success, data: parsedData } = paramsSchema.safeParse(params);
   if (!success)
   {
@@ -63,7 +64,18 @@ export const loader = ({params} : Route.LoaderArgs) => {
       }
     )
   }
-  return {...parsedData};
+  const url = new URL(request.url);
+  const products = await getProductsByDataRange({
+    startDate: date.startOf("year"),
+    endDate: date.endOf("year"),
+    limit: PAGE_SIZE,
+    page: Number(url.searchParams.get("page") ?? "1"),
+  });
+  const totalPages = await getProductPagesByDataRange({
+    startDate: date.startOf("year"),
+    endDate: date.endOf("year"),
+  });
+  return {...parsedData, products, totalPages};
 }
 
 export default function YearlyLeaderboardsPage({loaderData} : Route.ComponentProps) {
@@ -97,19 +109,19 @@ export default function YearlyLeaderboardsPage({loaderData} : Route.ComponentPro
         }
       </div>
       <div className="space-y-5 w-full max-w-screen-md mx-auto">
-        {Array.from({ length: 10 }).map((_, index) => (
+        {loaderData.products.map((product, index) => (
           <ProductCard
             key={index}
-            productId={`productId-${index}`}
-            productName={`Product Name ${index}`}
-            productDescription={`Product Description ${index}`}
-            messageCount={12}
-            viewCount={12}
-            upvoteCount={120}
+            productId={product.product_id.toString()}
+            productName={product.name}
+            productDescription={product.description}
+            reviewsCount={product.reviews}
+            viewsCount={product.views}
+            upvotesCount={product.upvotes}
           />
         ))}
       </div>
-      <ProductPagination totalPages={10} />
+      <ProductPagination totalPages={loaderData.totalPages} />
     </div>
   );
 } 
