@@ -8,6 +8,9 @@ type Database = MergeDeep<SupabaseDatabase, {
             community_post_list_view: {
                 Row: SetFieldType<SetNonNullable<SupabaseDatabase["public"]["Views"]["community_post_list_view"]["Row"]>, "author_avatar", string | null>
             }
+            gpt_ideas_view: {
+                Row: SetNonNullable<SupabaseDatabase["public"]["Views"]["gpt_ideas_view"]["Row"]>,
+            }
         }
     }
 }>

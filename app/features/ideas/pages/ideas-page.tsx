@@ -1,6 +1,7 @@
 import { Hero } from "~/common/components/hero";
 import type { Route } from "./+types/ideas-page";
 import { IdeaCard } from "../components/idea-card";
+import { getGptIdeas } from "../queries";
 
 
 export const meta : Route.MetaFunction = () => {
@@ -10,21 +11,26 @@ export const meta : Route.MetaFunction = () => {
   ]
 }
 
-export default function IdeasPage() {
+export const loader = async () => {
+  const ideas = await getGptIdeas({
+    limit: 20,
+  });
+  return { ideas };
+}
+
+export default function IdeasPage({loaderData} : Route.ComponentProps) {
   return (
     <div className="space-y-20">
       <Hero title="IdeasGPT" subtitle="Find ideas for your next project"/>
       <div className="grid grid-cols-4 gap-4">
-        {Array.from({length: 10}).map((_, index) => (
+        {loaderData.ideas?.map((idea) => (
           <IdeaCard
-          ideaId="ideaId"
-          title="A startup that creates an AI-powered generated personl trainer, 
-          delivering customized fitness recommendations and tracking of progress using a mobile app to track workout
-          s and progress as well as a website to manage the business."
-          viewCount={123}
-          timeAgo="12 hours ago"
-          likeCount={123}
-          claimed={index % 2 === 0}
+          ideaId={idea.gpt_idea_id}
+          title={idea.idea}
+          viewCount={idea.views}
+          timeAgo={idea.created_at}
+          likeCount={idea.likes}
+          claimed={idea.is_claimed}
           />
         ))}
       </div>
