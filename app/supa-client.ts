@@ -11,6 +11,9 @@ type Database = MergeDeep<SupabaseDatabase, {
             gpt_ideas_view: {
                 Row: SetNonNullable<SupabaseDatabase["public"]["Views"]["gpt_ideas_view"]["Row"]>,
             }
+            product_overview_view: {
+                Row: SetNonNullable<SupabaseDatabase["public"]["Views"]["product_overview_view"]["Row"]>,
+            }
         }
     }
 }>
