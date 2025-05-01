@@ -2,6 +2,7 @@ import React from 'react';
 import type { Route } from './+types/teams-page';
 import { Hero } from '~/common/components/hero';
 import { TeamCard } from '../components/team-card';
+import { getTeams } from '../queries';
 
 export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   return [
@@ -9,7 +10,14 @@ export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   ];
 };
 
-export default function TeamsPage() {
+export const loader = async () => {
+  const teams = await getTeams({
+    limit: 10,
+  });
+  return { teams };
+};
+
+export default function TeamsPage({loaderData}: Route.ComponentProps) {
   return (
     <div className="space-y-20">
       <Hero 
@@ -17,14 +25,14 @@ export default function TeamsPage() {
         subtitle="Find your team" 
       />
       <div className="grid grid-cols-4 gap-4">
-        {Array.from({ length: 10 }).map((_, index) => (
+        {loaderData.teams?.map((team) => (
           <TeamCard
-            key={index}
-            teamId="teamId"
-            avatarSrc="https://github.com/inthetiger.png"
-            username="nico"
-            roles={["React Developer", "Backend Developer", "Product Manager"]}
-            projectDescription="a new social media platform"
+            key={team.team_id}
+            teamId={team.team_id}
+            avatarSrc={team.team_leader.avatar}
+            username={team.team_leader.username}
+            roles={team.roles.split(",")}
+            projectDescription={team.product_description}
           />
         ))}
       </div>

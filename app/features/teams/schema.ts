@@ -1,7 +1,8 @@
-import { bigint, check, integer, pgEnum, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { bigint, check, integer, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { PRODUCT_STAGES } from "./constants";
 import { table } from "console";
 import { sql } from "drizzle-orm";
+import { profiles } from "../users/schema";
 
 export const product_stage = pgEnum("product_stage", PRODUCT_STAGES.map((stage) => stage.value) as [string, ...string[]]);
 
@@ -13,6 +14,7 @@ export const teams = pgTable("teams", {
   product_stage : product_stage().notNull(),
   roles: text().notNull(),
   product_description: text().notNull(),
+  team_leader_id: uuid().references(() => profiles.profile_id, {onDelete: "cascade"}).notNull(),
   created_at: timestamp().notNull().defaultNow(),
   updated_at: timestamp().notNull().defaultNow(),
 }, (table) => [

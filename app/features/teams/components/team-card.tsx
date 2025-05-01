@@ -5,8 +5,8 @@ import { Badge } from "app/common/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "app/common/components/ui/avatar";
 
 interface TeamCardProps {
-  teamId: string;
-  avatarSrc: string;
+  teamId: number;
+  avatarSrc: string | null;
   username: string;
   roles: string[];
   projectDescription: string;
@@ -20,15 +20,15 @@ export function TeamCard({
   projectDescription,
 }: TeamCardProps) {
   return (
-    <Link to={`/teams/${teamId}`}>
-      <Card className="bg-transparent hover:bg-card/50 transition-colors">
+    <Link to={`/teams/${teamId}`} className="block">
+      <Card className="bg-transparent hover:bg-card/50 flex flex-col justify-between transition-colors h-full">
         <CardHeader className="flex flex-row items-center">
           <CardTitle className="text-base leading-loose">
             <Badge variant="secondary" className="inline-flex shadow-sm items-center">
               <span>@{username}</span>
               <Avatar className="size-5">
                 <AvatarFallback>{username.charAt(0)}</AvatarFallback>
-                <AvatarImage src={avatarSrc} />
+                {avatarSrc && <AvatarImage src={avatarSrc} />}
               </Avatar>
             </Badge>
             <span> is looking for </span>
