@@ -8,7 +8,7 @@ export default function ProfilePostsPage() {
       {Array.from({ length: 10 }).map((_, index) => (
         <PostCard
           key={index}
-          postId={`postId-${index}`}
+          postId={index}
           avatarSrc="https://github.com/shadcn.png"
           title="What is the best productivity tool?"
           author="Nico On"

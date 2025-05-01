@@ -6,7 +6,7 @@ export default function ProfileProductsPage() {
        {Array.from({ length: 10 }).map((_, index) => (
           <ProductCard
             key={index}
-            productId={`productId-${index}`}
+            productId={index}
             productName={`Product Name ${index}`}
             productDescription={`Product Description ${index}`}
             messageCount={12}

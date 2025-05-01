@@ -2,6 +2,15 @@ import type { DateTime } from "luxon";
 import client from "~/supa-client";
 import { PAGE_SIZE } from "./contants";
 
+const productListSelect = `
+  product_id,
+  name, 
+  tagline, 
+  upvotes:stats->>upvotes, 
+  views:stats->>views, 
+  reviews:stats->>reviews
+`;
+
 export const getProductsByDataRange = async({
   startDate,
   endDate,
@@ -14,13 +23,7 @@ export const getProductsByDataRange = async({
   page?: number,
 }) => {
   const {data, error} = await client.from("products")
-    .select(`
-      product_id,
-      name, 
-      description, 
-      upvotes:stats->>upvotes, 
-      views:stats->>views, 
-      reviews:stats->>reviews`)
+    .select(productListSelect)
     .order("stats->>upvotes", {ascending: false})
     .gte("created_at", startDate.toISO())
     .lte("created_at", endDate.toISO())
@@ -67,7 +70,7 @@ export const getCategory = async ({categoryId}: {categoryId: number}) => {
 
 export const getProductsByCategory = async ({categoryId, page}: {categoryId: number, page: number}) => {
   const {data, error} = await client.from("products")
-  .select("product_id, name, description, stats->>upvotes, stats->>views, stats->>reviews")
+  .select(productListSelect)
   .eq("category_id", categoryId)
   .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
   if (error) {
@@ -92,3 +95,34 @@ export const getCategoryPages = async({
   return Math.ceil(count / PAGE_SIZE);
 };
 
+export const getProductsBySearch = async({
+  query,
+  page,
+}:{
+  query: string,
+  page: number,
+}) => {
+  const {data, error} = await client.from("products")
+    .select(productListSelect)
+    .or(`name.ilike.%${query}%, tagline.ilike.%${query}%`)
+    .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+};
+
+export const getPagesBySearch = async({
+  query,
+}:{
+  query: string,
+}) => {
+  const {count, error} = await client.from("products")
+    .select(`product_id`, {count:"exact", head:true})
+    .or(`name.ilike.%${query}%, tagline.ilike.%${query}%`)
+  if (error) {
+    throw new Error(error.message);
+  }
+  if (!count) return 1;
+  return Math.ceil(count / PAGE_SIZE);
+};

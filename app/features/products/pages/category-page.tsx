@@ -41,7 +41,7 @@ export default function CategoryPage({loaderData}: Route.ComponentProps) {
             key={product.product_id}
             productId={product.product_id}
             productName={product.name}
-            productDescription={product.description}
+            productDescription={product.tagline}
             viewsCount={product.views}
             reviewsCount={product.reviews}
             upvotesCount={product.upvotes}

@@ -120,9 +120,9 @@ export default function WeeklyLeaderboardsPage({loaderData} : Route.ComponentPro
         {loaderData.products.map((product, index) => (
           <ProductCard
             key={index}
-            productId={product.product_id.toString()}
+            productId={product.product_id}
             productName={product.name}
-            productDescription={product.description}
+            productDescription={product.tagline}
             reviewsCount={product.reviews}
             viewsCount={product.views}
             upvotesCount={product.upvotes}
