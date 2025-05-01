@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 interface CategoryCardProps {
-  id: string;
+  id: number;
   categoryName: string;
   description: string;
 }

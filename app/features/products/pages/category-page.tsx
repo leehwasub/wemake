@@ -1,10 +1,9 @@
 import { Hero } from "~/common/components/hero";
-import type { Route } from "./+types/categories-page";
-import { Input } from "~/common/components/ui/input";
-import { Button } from "~/common/components/ui/button";
+import type { Route } from "./+types/category-page";
 import { ProductCard } from "../components/product-card";
-import { Form } from "react-router";
 import { ProductPagination } from "~/common/components/product-pagination";
+import { getCategory, getCategoryPages, getProductsByCategory } from "../queries";
+import { z } from "zod";
 
 export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
   return [
@@ -13,25 +12,43 @@ export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
   ]
 }
 
+const paramsSchema = z.object({
+  category: z.coerce.number(),
+  page: z.coerce.number().optional().default(1),
+});
 
-export default function CategoryPage() {
+export const loader = async ({params, request} : Route.LoaderArgs) => {
+  const url = new URL(request.url);
+  const page = Number(url.searchParams.get("page") ?? "1");
+  const {data, success} = paramsSchema.safeParse(params);
+  if (!success) {
+    throw new Error("Invalid category");
+  }
+  const category = await getCategory({categoryId: data.category});
+  const products = await getProductsByCategory({categoryId: data.category, page});
+  const totalPages = await getCategoryPages({categoryId: data.category});
+  return { category, products, totalPages };
+}
+
+export default function CategoryPage({loaderData}: Route.ComponentProps) {
+  const {category, products, totalPages} = loaderData;
   return (
     <div className="space-y-10">
-    <Hero title="Developer Tools" subtitle="Tools for developers to build products faster" />
+    <Hero title={category.name} subtitle={category.description} />
     <div className="space-y-5 w-full max-w-screen-md mx-auto">
-        {Array.from({ length: 10 }).map((_, index) => (
+        {products.map((product) => (
           <ProductCard
-            key={index}
-            productId={`productId-${index}`}
-            productName={`Product Name ${index}`}
-            productDescription={`Product Description ${index}`}
-            messageCount={12}
-            viewCount={12}
-            upvoteCount={120}
+            key={product.product_id}
+            productId={product.product_id}
+            productName={product.name}
+            productDescription={product.description}
+            viewsCount={product.views}
+            reviewsCount={product.reviews}
+            upvotesCount={product.upvotes}
           />
         ))}
       </div>
-      <ProductPagination totalPages={10}/>
+      <ProductPagination totalPages={totalPages}/>
   </div>
   );
 } 
