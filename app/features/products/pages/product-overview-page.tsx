@@ -1,9 +1,4 @@
-import { ChevronUpIcon, StarIcon } from "lucide-react";
-import type { Route } from "./+types/product-overview-page";
-import { Button } from "~/common/components/ui/button";
-import { Link, useOutletContext } from "react-router";
-import { getProductById } from "../queries";
-
+import { useOutletContext } from "react-router";
 
 export default function ProductOverviewPage() {
   const {productId, description, how_it_works} = useOutletContext<{productId: number, description: string, how_it_works: string}>();

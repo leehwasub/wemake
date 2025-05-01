@@ -121,7 +121,7 @@ export const getPagesBySearch = async({
     .select(`product_id`, {count:"exact", head:true})
     .or(`name.ilike.%${query}%, tagline.ilike.%${query}%`)
   if (error) {
-    throw new Error(error.message);
+    throw error;
   }
   if (!count) return 1;
   return Math.ceil(count / PAGE_SIZE);
@@ -130,7 +130,24 @@ export const getPagesBySearch = async({
 export const getProductById = async({productId}: {productId: number}) => {
   const {data, error} = await client.from("product_overview_view").select("*").eq("product_id", productId).single();
   if (error) {
-    throw new Error(error.message);
+    throw error;
+  }
+  return data;
+};
+
+export const getReviews = async({productId}: {productId: number}) => {
+  const {data, error} = await client.from("reviews").select(`
+    review_id,
+    rating,
+    review,
+    created_at,
+    user:profiles!inner(
+      name,
+      username,
+      avatar
+    )`).eq("product_id", productId);
+  if (error) {
+    throw error;
   }
   return data;
 };

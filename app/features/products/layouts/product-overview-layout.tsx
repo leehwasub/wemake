@@ -53,7 +53,12 @@ export default function ProductOverviewLayout({loaderData} : Route.ComponentProp
         <NavLink className={({isActive}) => cn([buttonVariants({variant: "outline"}), isActive && "bg-red-500 text-foreground font-bold"])} to={`/products/${product.product_id}/reviews`}>Reviews</NavLink>
       </div>
       <div>
-        <Outlet context={{productId: product.product_id, description: product.description, how_it_works: product.how_it_works}}/>
+        <Outlet context={{
+          productId: product.product_id, 
+          description: product.description, 
+          how_it_works: product.how_it_works,
+          review_count: product.reviews,
+        }}/>
       </div>
     </div>
   );
