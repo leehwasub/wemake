@@ -8,6 +8,7 @@ import { Button } from "~/common/components/ui/button";
 import { ProductPagination } from "~/common/components/product-pagination";
 import { getProductPagesByDataRange, getProductsByDataRange } from "../queries";
 import { PAGE_SIZE } from "../contants";
+import { makeSSRClient } from "~/supa-client";
 const paramsSchema = z.object({
   year: z.coerce.number(),
 });
@@ -25,6 +26,7 @@ export const meta : Route.MetaFunction = ({params}) => {
 
 
 export const loader = async ({params, request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
   const { success, data: parsedData } = paramsSchema.safeParse(params);
   if (!success)
   {
@@ -65,13 +67,13 @@ export const loader = async ({params, request} : Route.LoaderArgs) => {
     )
   }
   const url = new URL(request.url);
-  const products = await getProductsByDataRange({
+  const products = await getProductsByDataRange(client, {
     startDate: date.startOf("year"),
     endDate: date.endOf("year"),
     limit: PAGE_SIZE,
     page: Number(url.searchParams.get("page") ?? "1"),
   });
-  const totalPages = await getProductPagesByDataRange({
+  const totalPages = await getProductPagesByDataRange(client, {
     startDate: date.startOf("year"),
     endDate: date.endOf("year"),
   });

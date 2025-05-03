@@ -4,6 +4,7 @@ import { ProductCard } from "../components/product-card";
 import { ProductPagination } from "~/common/components/product-pagination";
 import { getCategory, getCategoryPages, getProductsByCategory } from "../queries";
 import { z } from "zod";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
   return [
@@ -18,15 +19,16 @@ const paramsSchema = z.object({
 });
 
 export const loader = async ({params, request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
   const url = new URL(request.url);
   const page = Number(url.searchParams.get("page") ?? "1");
   const {data, success} = paramsSchema.safeParse(params);
   if (!success) {
     throw new Error("Invalid category");
   }
-  const category = await getCategory({categoryId: data.category});
-  const products = await getProductsByCategory({categoryId: data.category, page});
-  const totalPages = await getCategoryPages({categoryId: data.category});
+  const category = await getCategory(client, {categoryId: data.category});
+  const products = await getProductsByCategory(client, {categoryId: data.category, page});
+  const totalPages = await getCategoryPages(client, {categoryId: data.category});
   return { category, products, totalPages };
 }
 

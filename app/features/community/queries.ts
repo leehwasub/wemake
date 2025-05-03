@@ -32,16 +32,16 @@ export const getPosts = async() => {
 }
 */
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { DateTime } from "luxon";
-import client from "~/supa-client"
+import type { Database } from "~/supa-client";
 
-export const getTopics = async() => {
+export const getTopics = async(client: SupabaseClient<Database>) => {
   const { data, error } = await client.from("topics").select("name, slug");
-  console.log(data, error);
   return data;
 }
 
-export const getPosts = async({limit, sorting, period, keyword, topic} : {limit: number, sorting: "newest" | "popular", period?: "all" | "today" | "week" | "month" | "year", keyword?: string, topic?: string}) => {
+export const getPosts = async(client: SupabaseClient<Database>,{limit, sorting, period, keyword, topic} : {limit: number, sorting: "newest" | "popular", period?: "all" | "today" | "week" | "month" | "year", keyword?: string, topic?: string}) => {
   const baseQuery = client.from("community_post_list_view").select("*").limit(limit);
   if (sorting === "newest") {
     baseQuery.order("created_at", { ascending: false });
@@ -78,7 +78,7 @@ export const getPosts = async({limit, sorting, period, keyword, topic} : {limit:
 }
 
 
-export const getPostById = async({postId} : {postId: number}) => {
+export const getPostById = async(client: SupabaseClient<Database>, {postId} : {postId: number}) => {
   const { data, error } = await client.from("community_post_detail").select("*").eq("post_id", postId).single();
   if (error) {
     throw error;
@@ -86,7 +86,7 @@ export const getPostById = async({postId} : {postId: number}) => {
   return data;
 }
 
-export const getReplies = async({postId} : {postId: number}) => {
+export const getReplies = async(client: SupabaseClient<Database>, {postId} : {postId: number}) => {
   const replyQuery = `reply, 
     created_at, 
     profiles(

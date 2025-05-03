@@ -24,6 +24,7 @@ import { getPosts } from "~/features/community/queries";
 import { getGptIdeas } from "~/features/ideas/queries";
 import { getJobs } from "~/features/jobs/queries";
 import { getTeams } from "~/features/teams/queries";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta: MetaFunction = () => {
   return [
@@ -32,23 +33,24 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const loader = async () => {
-  const products = await getProductsByDataRange({
+export const loader = async ({request}: Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const products = await getProductsByDataRange(client, {
     startDate: DateTime.now().startOf("day"),
     endDate: DateTime.now().endOf("day"),
     limit: 7,
   });
-  const posts = await getPosts({  
+  const posts = await getPosts(client, {  
     limit: 7,
     sorting: "newest",
   });
-  const ideas = await getGptIdeas({
+  const ideas = await getGptIdeas(client, {
     limit: 7,
   });
-  const jobs = await getJobs({
+  const jobs = await getJobs(client, {
     limit: 11,
   });
-  const teams = await getTeams({
+  const teams = await getTeams(client, {
     limit: 10,
   });
   return { products, posts, ideas, jobs, teams };
@@ -69,7 +71,7 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/products/leaderboards">Explore all products &rarr;</Link>
           </Button>
         </div>
-        {loaderData.products.map((product) => (
+        {loaderData.products.map((product: any) => (
           <ProductCard
             key={product.product_id}
             productId={product.product_id}
@@ -93,7 +95,7 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/community">Explore all Discussions &rarr;</Link>
           </Button>
         </div>
-        {loaderData.posts?.map((post) => (
+        {loaderData.posts?.map((post: any) => (
           <PostCard
             key={post.post_id}
             postId={post.post_id}
@@ -117,7 +119,7 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/community">Explore all ideas &rarr;</Link>
           </Button>
         </div>
-        {loaderData.ideas?.map((idea) => (
+        {loaderData.ideas?.map((idea: any) => (
         <IdeaCard
           ideaId={idea.gpt_idea_id}
           title={idea.idea}
@@ -140,7 +142,7 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/jobs">Explore all jobs &rarr;</Link>
           </Button>
         </div>
-        {loaderData.jobs?.map((job) => (
+        {loaderData.jobs?.map((job: any) => (
           <JobCard
             key={job.job_id}
             jobId={job.job_id}
@@ -167,7 +169,7 @@ export default function HomePage({loaderData}: Route.ComponentProps) {
             <Link to="/jobs">Explore all teams &rarr;</Link>
           </Button>
         </div>
-        {loaderData.teams?.map((team) => (
+        {loaderData.teams?.map((team: any) => (
           <TeamCard
             key={team.team_id}
             teamId={team.team_id}

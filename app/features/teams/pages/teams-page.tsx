@@ -3,6 +3,7 @@ import type { Route } from './+types/teams-page';
 import { Hero } from '~/common/components/hero';
 import { TeamCard } from '../components/team-card';
 import { getTeams } from '../queries';
+import { makeSSRClient } from '~/supa-client';
 
 export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   return [
@@ -10,8 +11,9 @@ export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   ];
 };
 
-export const loader = async () => {
-  const teams = await getTeams({
+export const loader = async ({request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const teams = await getTeams(client, {
     limit: 10,
   });
   return { teams };

@@ -1,7 +1,8 @@
-import client from "~/supa-client";
+import type { Database } from "~/supa-client";
 import { productListSelect } from "../products/queries";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-export const getUserProfile = async (username: string) => {
+export const getUserProfile = async (client: SupabaseClient<Database>, {username}: {username: string}) => {
   const {data, error} = await client.from("profiles").select(`
     profile_id,
     name,
@@ -17,7 +18,7 @@ export const getUserProfile = async (username: string) => {
   return data;
 }
 
-export const getUserProducts = async (username: string) => {
+export const getUserProducts = async (client: SupabaseClient<Database>, {username}: {username: string}) => {
   const {data, error} = await client
   .from("products")
   .select(`${productListSelect}, profiles!products_profile_id_profiles_profile_id_fk!inner(
@@ -29,7 +30,7 @@ export const getUserProducts = async (username: string) => {
   return data;
 }
 
-export const getUserPosts = async (username: string) => {
+export const getUserPosts = async (client: SupabaseClient<Database>, {username}: {username: string}) => {
   const {data, error} = await client.from("community_post_list_view").select("*").eq("author_username", username);
   if (error) {
     throw error;

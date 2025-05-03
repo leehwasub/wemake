@@ -8,6 +8,7 @@ import { Form } from 'react-router';
 import InputPair from '~/common/components/input-pair';
 import { Card, CardContent, CardHeader, CardTitle } from '~/common/components/ui/card';
 import { getTeamById } from '../queries';
+import { makeSSRClient } from '~/supa-client';
 
 export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   return [
@@ -15,8 +16,9 @@ export const meta: Route.MetaFunction = ({ params }: Route.MetaArgs) => {
   ];
 };
 
-export const loader = async ({params} : Route.LoaderArgs) => {
-  const team = await getTeamById({teamId: Number(params.teamId)});
+export const loader = async ({params, request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const team = await getTeamById(client, {teamId: Number(params.teamId)});
   return {team};
 }
 

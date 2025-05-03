@@ -11,6 +11,7 @@ import { PostCard } from '../components/post-card';
 import { getPosts, getTopics } from '../queries';
 import type { Route } from './+types/community-page';
 import { z } from 'zod';
+import { makeSSRClient } from '~/supa-client';
 
 const searchParamsSchema = z.object({
   sort: z.enum(["newest", "popular"]).optional().default("newest"),
@@ -20,6 +21,7 @@ const searchParamsSchema = z.object({
 });
 
 export const loader = async({request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
   //await new Promise(resolve => setTimeout(resolve, 1000));
   // const topics = await getTopics();
   // const posts = await getPosts();
@@ -38,8 +40,8 @@ export const loader = async({request} : Route.LoaderArgs) => {
       }
     );
   }
-  const topics = await getTopics();
-  const posts = await getPosts({
+  const topics = await getTopics(client);
+  const posts = await getPosts(client, {
     limit: 20,
     sorting: parsedData.sort,
     period: parsedData.period,

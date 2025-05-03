@@ -4,6 +4,7 @@ import { DotIcon } from "lucide-react";
 import { Button } from "~/common/components/ui/button";
 import { getJobById } from "../queries";
 import { DateTime } from "luxon";
+import { makeSSRClient } from "~/supa-client";
 
 export const meta : Route.MetaFunction = () => {
   return [
@@ -12,8 +13,9 @@ export const meta : Route.MetaFunction = () => {
   ]
 }
 
-export const loader = async ({params} : Route.LoaderArgs) => {
-  const job = await getJobById({jobId: Number(params.jobId)});
+export const loader = async ({params, request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const job = await getJobById(client, {jobId: Number(params.jobId)});
   return {job};
 }
 

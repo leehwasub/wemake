@@ -14,7 +14,7 @@ export default function DashboardIdeasPage() {
       <div className="grid grid-cols-4 gap-6">
         {Array.from({ length: 10 }).map((_, index) => (
           <IdeaCard
-            ideaId="ideaId"
+            ideaId={index}
             title="A startup that creates an AI-powered generated personl trainer, 
             delivering customized fitness recommendations and tracking of progress using a mobile app to track workout
             s and progress as well as a website to manage the business."
