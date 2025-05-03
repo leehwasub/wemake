@@ -1,19 +1,26 @@
 import { PostCard } from "~/features/community/components/post-card";
 import { ProductCard } from "~/features/products/components/product-card";
+import type { Route } from "./+types/profile-posts-page";
+import { getUserPosts } from "../queries";
 
-export default function ProfilePostsPage() {
+export const loader = async ({params} : Route.LoaderArgs) => {
+  const posts = await getUserPosts(params.username);
+  return {posts};
+} 
+
+export default function ProfilePostsPage({loaderData} : Route.ComponentProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      {Array.from({ length: 10 }).map((_, index) => (
+      {loaderData.posts.map((post) => (
         <PostCard
-          key={index}
-          postId={index}
-          avatarSrc="https://github.com/shadcn.png"
-          title="What is the best productivity tool?"
-          author="Nico On"
-          category="Productivity"
-          timeAgo="12 hours ago"
+          key={post.post_id}
+          postId={post.post_id}
+          avatarSrc={post.author_avatar}
+          title={post.title}
+          author={post.author}
+          category={post.topic}
+          timeAgo={post.created_at}
           expanded={true}
         />
       ))}
