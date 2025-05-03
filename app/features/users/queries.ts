@@ -1,0 +1,45 @@
+import client from "~/supa-client";
+import { productListSelect } from "../products/queries";
+
+export const getUserProfile = async (username: string) => {
+  const {data, error} = await client.from("profiles").select(`
+    profile_id,
+    name,
+    username,
+    avatar,
+    role,
+    headline,
+    bio
+    `).eq("username", username).single();
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+export const getUserProducts = async (username: string) => {
+  const {data, error} = await client
+  .from("products")
+  .select(`${productListSelect}, profiles!products_profile_id_profiles_profile_id_fk!inner(
+    profile_id)`)
+  .eq("profiles.username", username);
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+export const getUserPosts = async (username: string) => {
+  const {data, error} = await client.from("posts").select(`
+    post_id,
+    title,
+    content,
+    image,
+    `).eq("username", username);
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+
