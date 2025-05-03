@@ -39,8 +39,8 @@ export default function ProductOverviewLayout({loaderData} : Route.ComponentProp
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant={"secondary"} size={"lg"} className="text-lg h-14 px-10">
-            Visit Website
+          <Button variant={"secondary"} size={"lg"} className="text-lg h-14 px-10" asChild>
+            <Link to={`/products/${loaderData.product.product_id}/visit`}>Visit Website</Link>
           </Button>
           <Button size={"lg"} className="text-lg h-14 px-10">
             <ChevronUpIcon className="size-4" />

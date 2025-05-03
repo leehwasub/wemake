@@ -1,11 +1,22 @@
 import { useOutletContext } from "react-router";
 import type { Route } from "./+types/profile-page";
+import client from "~/supa-client";
 
 export const meta: Route.MetaFunction = () => {
   return [
     { title: 'Profile Page' },
   ];
 };
+
+export const loader = async ({params} : Route.LoaderArgs) => {
+  await client.rpc("track_event", {
+    event_type: "profile_view",
+    event_data: {
+      username: params.username,
+    },
+  });
+  return null;
+}
 
 export default function ProfilePage() {
   const {headline, bio} = useOutletContext<{headline: string, bio: string}>();
