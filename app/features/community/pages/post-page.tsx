@@ -9,7 +9,7 @@ import { Textarea } from '~/common/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
 import { Reply } from '../components/reply';
-import { getPostById } from '../queries';
+import { getPostById, getReplies } from '../queries';
 import { DateTime } from 'luxon';
 
 export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
@@ -20,11 +20,12 @@ export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
 
 export const loader = async ({params} : Route.LoaderArgs) => {
   const post = await getPostById({postId: Number(params.postId)});
-  return {post};
+  const replies = await getReplies({postId: Number(params.postId)});
+  return {post, replies};
 }
 
 export default function PostPage({loaderData} : Route.ComponentProps) {
-  const {post} = loaderData;
+  const {post, replies} = loaderData;
   return (
     <div className="space-y-10">
       <Breadcrumb>
@@ -55,7 +56,7 @@ export default function PostPage({loaderData} : Route.ComponentProps) {
               <ChevronUpIcon className="size-4 shrink-0" />
               <span>{post.upvotes}</span>
             </Button>
-            <div className="space-y-20">
+            <div className="space-y-20 w-full">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold">{post.title}</h2>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -88,14 +89,17 @@ export default function PostPage({loaderData} : Route.ComponentProps) {
               <div className="space-y-10">
                 <h4 className="font-semibold">{post.replies} Replies</h4>
                 <div className="flex flex-col gap-5">
-                  <Reply
-                    avatarSrc="https://github.com/microsoft.png"
-                    userName="Nicolas"
-                    userLink="/user/@nico"
-                    timeAgo="12 hours ago"
-                    message="I've been using Todoist for a while now and it's great. It's easy to use and has a lot of features."
-                    topLevel={true}
-                  />
+                  {replies.map((reply) => (
+                    <Reply
+                      avatarSrc={reply.profiles.avatar}
+                      userName={reply.profiles.name}
+                      userLink={`/user/@${reply.profiles.username}`}
+                      timeAgo={reply.created_at}
+                      message={reply.reply}
+                      topLevel={true}
+                      replies={reply.post_replies}
+                    />
+                  ))}
                 </div>
               </div>
             </div>

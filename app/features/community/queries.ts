@@ -86,4 +86,23 @@ export const getPostById = async({postId} : {postId: number}) => {
   return data;
 }
 
-
+export const getReplies = async({postId} : {postId: number}) => {
+  const replyQuery = `reply, 
+    created_at, 
+    profiles(
+      name, 
+      avatar,
+      username
+    )`;
+  const { data, error } = await client.from("post_replies").select(`
+    ${replyQuery},
+    post_replies(
+      ${replyQuery}
+    )
+    `)
+    .eq("post_id", postId);
+  if (error) {
+    throw error;
+  }
+  return data;
+}

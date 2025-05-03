@@ -4,34 +4,44 @@ import { Button } from '~/common/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '~/common/components/ui/avatar';
 import { DotIcon, MessageCircleIcon } from 'lucide-react';
 import { Textarea } from '~/common/components/ui/textarea';
+import { DateTime } from 'luxon';
 
 interface ReplyProps {
-  avatarSrc: string;
+  avatarSrc: string | null;
   userName: string;
   userLink: string;
   timeAgo: string;
   message: string;
   topLevel?: boolean;
+  replies?: {
+    reply: string;
+    created_at: string;
+    profiles: {
+        name: string;
+        avatar: string | null;
+        username: string;
+    };
+  }[];
 }
 
-export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLevel = false }: ReplyProps) {
+export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLevel = false, replies }: ReplyProps) {
   const [replying, setReplying] = useState(false);
   const toggleReplying = () => setReplying(prev => !prev);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       <div className="flex items-start gap-5 w-2/3">
       <Avatar className="size-14">
         <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-        <AvatarImage src={avatarSrc} />
+        <AvatarImage src={avatarSrc ?? ""} />
       </Avatar>
-      <div className="flex flex-col gap-4 items-start">
+      <div className="flex flex-col gap-4 items-start w-full">
         <div className="flex gap-2 items-center">
           <Link to={userLink}>
             <h4 className="font-medium">{userName}</h4>
           </Link>
           <DotIcon className="size-5" />
           <span className="text-xs text-muted-foreground">
-            {timeAgo}
+            {DateTime.fromISO(timeAgo).toRelative()}
           </span>
         </div>
         <p className="text-muted-foreground">
@@ -59,15 +69,18 @@ export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLeve
         </div>
     </Form>
     }
-    {topLevel && (
+    {topLevel && replies && (
       <div className="pl-10 w-full">
-        <Reply 
-          avatarSrc="https://github.com/microsoft.png"
-          userName="Nicolas"
-          userLink="/user/@nico"
-          timeAgo="12 hours ago"
-          message="I've been using Todoist for a while now and it's great. It's easy to use and has a lot of features."
-        />
+        {replies.map((reply) => (
+          <Reply 
+            avatarSrc={reply.profiles.avatar}
+            userName={reply.profiles.name}
+            userLink={`/user/@${reply.profiles.username}`}
+            timeAgo={reply.created_at}
+            message={reply.reply}
+            topLevel={false}
+          />
+        ))}
       </div>
     )}
     </div>
