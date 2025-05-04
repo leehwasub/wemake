@@ -1,3 +1,5 @@
+drop function if exists public.handle_new_user() CASCADE;
+
 create function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -7,7 +9,7 @@ as $$
 begin
   --create a anonymous profile for the user 
   if new.raw_app_meta_data is not null then 
-    if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'email' then 
+    if new.raw_app_meta_data ? 'provider' AND new.raw_app_meta_data ->> 'provider' = 'email' OR new.raw_app_meta_data ->> 'provider' = 'sms' then 
       if new.raw_user_meta_data ? 'name' AND new.raw_user_meta_data ? 'username' then
         insert into public.profiles (profile_id, name, username, role) 
         values (new.id, new.raw_user_meta_data ->> 'name', new.raw_user_meta_data ->> 'username', 'developer');
