@@ -119,7 +119,7 @@ const menus = [
   }
 ];
 
-export default function Navigation({isLoggedIn, hasNotifications, hasMessages}:{isLoggedIn:boolean, hasNotifications:boolean, hasMessages:boolean}) {
+export default function Navigation({isLoggedIn, hasNotifications, hasMessages, username, avatar, name}:{isLoggedIn:boolean, hasNotifications:boolean, hasMessages:boolean, username?:string | null, avatar?:string | null, name?:string | null}) {
   return (
   <nav className="flex px-20 h-16 items-center justify-between backdrop-blur fixed top-0 left-0 right-0 z-50 bg-background/50">
     <div className="flex items-center">
@@ -182,14 +182,13 @@ export default function Navigation({isLoggedIn, hasNotifications, hasMessages}:{
        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" className="w-10 h-10" />
-            <AvatarFallback>N</AvatarFallback>
+            {avatar ? <AvatarImage src={avatar} className="w-10 h-10" /> : <AvatarFallback className="size-10">{name?.charAt(0)}</AvatarFallback>}
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel className="flex flex-col">
-            <span className="font-medium">John Doe</span>
-            <span className="text-xs text-muted-foreground">@username</span>
+            <span className="font-medium">{name}</span>
+            <span className="text-xs text-muted-foreground">@{username}</span>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -228,7 +227,7 @@ export default function Navigation({isLoggedIn, hasNotifications, hasMessages}:{
           <Link to="/auth/login">Login</Link>
         </Button>
         <Button asChild>
-          <Link to="/auth/signup">Sign Up</Link>
+          <Link to="/auth/join">Sign Up</Link>
         </Button>
       </div>
     )}
