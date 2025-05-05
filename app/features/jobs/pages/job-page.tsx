@@ -6,10 +6,10 @@ import { getJobById } from "../queries";
 import { DateTime } from "luxon";
 import { makeSSRClient } from "~/supa-client";
 
-export const meta : Route.MetaFunction = () => {
+export const meta : Route.MetaFunction = ({data}) => {
   return [
-    {title: "Job Pages | wemake"},
-    {name: "description", content: "Find ideas for your next project"},
+    {title: `${data?.job.position} | wemake`},
+    {name: "description", content: data?.job.overview},
   ]
 }
 
