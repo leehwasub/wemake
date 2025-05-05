@@ -72,8 +72,6 @@ export const getPosts = async(client: SupabaseClient<Database>,{limit, sorting, 
   }
 
   const { data, error } = await baseQuery;
-  console.log(data, error);
-  console.log(period);
   return data;
 }
 
@@ -87,7 +85,9 @@ export const getPostById = async(client: SupabaseClient<Database>, {postId} : {p
 }
 
 export const getReplies = async(client: SupabaseClient<Database>, {postId} : {postId: number}) => {
-  const replyQuery = `reply, 
+  const replyQuery = `
+    post_reply_id,
+    reply, 
     created_at, 
     profiles(
       name, 

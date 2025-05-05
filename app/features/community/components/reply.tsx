@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Form, Link } from 'react-router';
+import React, { useEffect, useState } from 'react';
+import { Form, Link, useActionData, useOutletContext } from 'react-router';
 import { Button } from '~/common/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '~/common/components/ui/avatar';
 import { DotIcon, MessageCircleIcon } from 'lucide-react';
 import { Textarea } from '~/common/components/ui/textarea';
 import { DateTime } from 'luxon';
+import type { action } from '../pages/post-page';
 
 interface ReplyProps {
   avatarSrc: string | null;
@@ -13,7 +14,9 @@ interface ReplyProps {
   timeAgo: string;
   message: string;
   topLevel?: boolean;
+  topLevelId: number;
   replies?: {
+    post_reply_id: number;
     reply: string;
     created_at: string;
     profiles: {
@@ -24,9 +27,16 @@ interface ReplyProps {
   }[];
 }
 
-export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLevel = false, replies }: ReplyProps) {
+export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLevel = false, topLevelId, replies }: ReplyProps) {
+  const actionData = useActionData<typeof action>();
   const [replying, setReplying] = useState(false);
   const toggleReplying = () => setReplying(prev => !prev);
+  const { isLoggedIn, name: loggedInName, avatar } = useOutletContext<{ isLoggedIn: boolean, name?: string, avatar?: string }>();
+  useEffect(() => {
+    if (actionData?.ok) {
+      setReplying(false);
+    }
+  }, [actionData]);
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-start gap-5 w-2/3">
@@ -47,30 +57,35 @@ export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLeve
         <p className="text-muted-foreground">
           {message}
         </p>
-        <Button variant={"ghost"} className="self-end" onClick={toggleReplying}>
-          <MessageCircleIcon className="size-4"/>
-          Reply
-        </Button>
+        {isLoggedIn &&
+          <Button variant={"ghost"} className="self-end" onClick={toggleReplying}>
+            <MessageCircleIcon className="size-4"/>
+              Reply
+          </Button>
+        }
       </div>
     </div>
     {replying && 
-      <Form className="flex items-start gap-5 w-3/4">
+      <Form className="flex items-start gap-5 w-3/4" method="post">
+        <input type="hidden" name="topLevelId" value={topLevelId} />
         <Avatar className="size-14">
-          <AvatarFallback>N</AvatarFallback>
-          <AvatarImage src="https://github.com/microsoft.png" />
+          <AvatarFallback>{loggedInName?.charAt(0)}</AvatarFallback>
+          <AvatarImage src={avatar ?? ""} />
         </Avatar>
         <div className="flex flex-col gap-5 items-end w-full">
           <Textarea 
+            name="reply"
             placeholder="Write a reply" 
             className="w-full resize-none"
+            defaultValue={`@${userName} `}    
             rows={10} 
           />
-          <Button>Reply</Button>
+          <Button type="submit">Reply</Button>
         </div>
     </Form>
     }
     {topLevel && replies && (
-      <div className="pl-10 w-full">
+      <div className="pl-10 w-full">  
         {replies.map((reply) => (
           <Reply 
             avatarSrc={reply.profiles.avatar}
@@ -79,6 +94,7 @@ export function Reply({ avatarSrc, userName, userLink, timeAgo, message, topLeve
             timeAgo={reply.created_at}
             message={reply.reply}
             topLevel={false}
+            topLevelId={topLevelId}
           />
         ))}
       </div>

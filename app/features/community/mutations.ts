@@ -18,9 +18,9 @@ export const createPost = async (client: SupabaseClient<Database>, {title, categ
   return data;
 }
 
-export const createReply = async (client: SupabaseClient<Database>, {postId, reply, userId}: {postId: number, reply: string, userId: string}) => {
+export const createReply = async (client: SupabaseClient<Database>, {postId, reply, userId, topLevelId}: {postId: number, reply: string, userId: string, topLevelId?: number}) => {
   const {error} = await client.from("post_replies").insert({
-    post_id: postId,
+    ...(topLevelId ? {parent_id: topLevelId} : {post_id: postId}),
     reply,
     profile_id: userId,
   }).select().single();

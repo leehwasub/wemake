@@ -31,18 +31,21 @@ export const loader = async ({params, request} : Route.LoaderArgs) => {
 
 const formSchema = z.object({
   reply: z.string().min(1),
+  topLevelId: z.coerce.number().optional(),
 });
 
 export const action = async ({request, params} : Route.ActionArgs) => {
   const {client, headers} = makeSSRClient(request);
   const userId = await getLoggedInUserId(client);
   const formData = await request.formData();
+  console.log("topLevelIdTest");
   const { success, data, error } = formSchema.safeParse(Object.fromEntries(formData));
   if (!success) {
     return {fieldErrors: error.flatten().fieldErrors};
   }
-  const {reply} = data;
-  await createReply(client, {postId: Number(params.postId), reply, userId});
+  const {reply, topLevelId} = data;
+  console.log("topLevelId : %d", topLevelId);
+  await createReply(client, {postId: Number(params.postId), reply, userId, topLevelId});
   return {ok: true};
 }
 
@@ -128,6 +131,7 @@ export default function PostPage({loaderData, actionData} : Route.ComponentProps
                       timeAgo={reply.created_at}
                       message={reply.reply}
                       topLevel={true}
+                      topLevelId={reply.post_reply_id}
                       replies={reply.post_replies}
                     />
                   ))}
