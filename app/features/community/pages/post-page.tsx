@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { Route } from './+types/post-page';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '~/common/components/ui/breadcrumb';
-import { Form, Link } from 'react-router';
+import { Form, Link, useOutletContext } from 'react-router';
 import { Button } from '~/common/components/ui/button';
 import { ChevronUpIcon, DotIcon, MessageCircleIcon } from 'lucide-react';
 import InputPair from '~/common/components/input-pair';
@@ -12,6 +12,9 @@ import { Reply } from '../components/reply';
 import { getPostById, getReplies } from '../queries';
 import { DateTime } from 'luxon';
 import { makeSSRClient } from '~/supa-client';
+import { getLoggedInUserId } from '~/features/users/queries';
+import { z } from 'zod';
+import { createReply } from '../mutations';
 
 export const meta : Route.MetaFunction = ({params} : Route.MetaArgs) => {
   return [
@@ -26,8 +29,32 @@ export const loader = async ({params, request} : Route.LoaderArgs) => {
   return {post, replies};
 }
 
-export default function PostPage({loaderData} : Route.ComponentProps) {
+const formSchema = z.object({
+  reply: z.string().min(1),
+});
+
+export const action = async ({request, params} : Route.ActionArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  const formData = await request.formData();
+  const { success, data, error } = formSchema.safeParse(Object.fromEntries(formData));
+  if (!success) {
+    return {fieldErrors: error.flatten().fieldErrors};
+  }
+  const {reply} = data;
+  await createReply(client, {postId: Number(params.postId), reply, userId});
+  return {ok: true};
+}
+
+export default function PostPage({loaderData, actionData} : Route.ComponentProps) {
   const {post, replies} = loaderData;
+  const {isLoggedIn, name, username, avatar} = useOutletContext<{isLoggedIn: boolean, name?: string, username?: string, avatar?: string}>();
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (actionData?.ok) {
+      formRef.current?.reset();
+    }
+  }, [actionData?.ok]);
   return (
     <div className="space-y-10">
       <Breadcrumb>
@@ -74,20 +101,22 @@ export default function PostPage({loaderData} : Route.ComponentProps) {
                   {post.content}
                 </p>
               </div>
-              <Form className="flex items-start gap-5 w-3/4">
+              {isLoggedIn && 
+              <Form ref={formRef} className="flex items-start gap-5 w-3/4" method="post">
                 <Avatar className="size-14">
-                  <AvatarFallback>N</AvatarFallback>
-                  <AvatarImage src="https://github.com/microsoft.png" />
+                  <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={avatar ?? ""} />
                 </Avatar>
                 <div className="flex flex-col gap-5 items-end w-full">
                   <Textarea 
+                    name="reply"
                     placeholder="Write a reply" 
                     className="w-full resize-none"
                     rows={10} 
                   />
-                  <Button>Reply</Button>
+                  <Button type="submit">Reply</Button>
                 </div>
-              </Form>
+              </Form>}
               <div className="space-y-10">
                 <h4 className="font-semibold">{post.replies} Replies</h4>
                 <div className="flex flex-col gap-5">
