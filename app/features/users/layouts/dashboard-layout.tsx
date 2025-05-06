@@ -3,8 +3,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/common/components/ui/avat
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "~/common/components/ui/sidebar";
 import { MessagesCard } from "../components/messages-card";
 import { HomeIcon, RocketIcon, SparklesIcon } from "lucide-react";
+import type { Route } from "./+types/dashboard-layout";
+import { makeSSRClient } from "~/supa-client";
+import { getLoggedInUserId, getUserProductsByUserId } from "../queries";
 
-export default function DashboardLayout() {
+export const loader = async ({request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  const products = await getUserProductsByUserId(client, {userId});
+  return {products};
+}
+
+export default function DashboardLayout({loaderData} : Route.ComponentProps) {
   const location = useLocation();
   return (
     <SidebarProvider className="flex min-h-full">
@@ -33,14 +43,16 @@ export default function DashboardLayout() {
           <SidebarGroup>
             <SidebarGroupLabel>Product Analytics</SidebarGroupLabel>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/my/dashboard/products/1">
+              {loaderData.products.map((product) => (
+                <SidebarMenuItem key={product.product_id}>
+                  <SidebarMenuButton asChild>
+                    <Link to={`/my/dashboard/products/${product.product_id}`}>
                     <RocketIcon className="size-4" />
-                    <span>Product 1</span>
+                    <span>{product.name}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
