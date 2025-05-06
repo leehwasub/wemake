@@ -9,7 +9,7 @@ import { Button } from "~/common/components/ui/button";
 import { getLoggedInUserId, getUserById } from "../queries";
 import { makeSSRClient } from "~/supa-client";
 import { z } from "zod";
-import { updateUser } from "../mutations";
+import { updateUser, updateUserAvatar } from "../mutations";
 import { Alert, AlertDescription, AlertTitle } from "~/common/components/ui/alert";
 
 export const meta: Route.MetaFunction = () => {
@@ -36,13 +36,35 @@ export const action = async ({request} : Route.ActionArgs) => {
   const {client, headers} = makeSSRClient(request);
   const userId = await getLoggedInUserId(client);
   const formData = await request.formData();
-  const {success, error, data} = formSchema.safeParse(Object.fromEntries(formData));
-  if (!success) {
-    return {fieldErrors: error.flatten().fieldErrors};
+  const avatar = formData.get("avatar");
+  if (avatar && avatar instanceof File) {
+    if (avatar.size <= 1024 * 1024 * 2 && avatar.type.startsWith("image/")) {
+      const {data, error} = await client.storage.from("avatars").upload(userId, avatar, {
+        contentType: avatar.type,
+        upsert: true,
+      });
+      if (error) {
+        return {error: error.message};
+      }
+      const {data: {publicUrl}} = await client.storage.from("avatars").getPublicUrl(data.path);
+      await updateUserAvatar(client, {id: userId, avatar: publicUrl});
+      return {ok: true};
+    }
+    else
+    {
+      return {error: "Invalid avatar"};
+    }
   }
-  const {name, role, headline, bio} = data;
-  await updateUser(client, {id: userId, name, role: role as "developer" | "designer" | "marketer" | "founder" | "product-manager", headline, bio});
-  return {ok: true};
+  else
+  {
+    const {success, error, data} = formSchema.safeParse(Object.fromEntries(formData));
+    if (!success) {
+      return {fieldErrors: error.flatten().fieldErrors};
+    }
+    const {name, role, headline, bio} = data;
+    await updateUser(client, {id: userId, name, role: role as "developer" | "designer" | "marketer" | "founder" | "product-manager", headline, bio});
+    return {ok: true};
+  }
 }
 
 export default function SettingsPage({loaderData, actionData} : Route.ComponentProps) {
@@ -119,7 +141,7 @@ export default function SettingsPage({loaderData, actionData} : Route.ComponentP
             <Button className="w-full" type="submit">Update Profile</Button>
           </Form>
         </div>
-        <aside className="col-span-2 p-6 rounded-lg border shadow-md">
+        <Form className="col-span-2 p-6 rounded-lg border shadow-md" method="post" encType="multipart/form-data">
           <Label className="flex flex-col items-start">Avatar
             <small className="text-muted-foreground">
               The avatar of your profile.
@@ -143,7 +165,7 @@ export default function SettingsPage({loaderData, actionData} : Route.ComponentP
             </div>
             <Button type="submit" className="w-full">Update Avatar</Button>
           </div>
-        </aside>
+        </Form>
       </div>
     </div>
   );
