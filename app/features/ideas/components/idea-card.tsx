@@ -8,15 +8,17 @@ import { DateTime } from "luxon";
 interface IdeaCardProps {
   ideaId: number;
   title: string;
-  viewCount: number;
-  timeAgo: string;
-  likeCount: number;  
+  owner?: boolean;
+  viewCount?: number;
+  timeAgo?: string;
+  likeCount?: number;  
   claimed?: boolean;
 }
 
 export function IdeaCard({
   ideaId,
   title,
+  owner,
   viewCount,
   timeAgo,
   likeCount,
@@ -25,29 +27,31 @@ export function IdeaCard({
   return (
     <Card className="bg-transparent hover:bg-card/50 transition-colors">
       <CardHeader>
-        <Link to={`/ideas/${ideaId}`}>
+        <Link to={claimed || owner ? "" : `/ideas/${ideaId}`}>
           <CardTitle className="text-xl">
-            <span className={cn(claimed ? "bg-muted-foreground selection:bg-muted-foreground text-muted-foreground" : "")}>{title}</span>
+            <span className={cn(claimed ? "bg-muted-foreground selection:bg-muted-foreground text-muted-foreground break-all" : "")}>{title}</span>
           </CardTitle>
         </Link>
       </CardHeader>
-      <CardContent className="flex items-center text-sm">
+      {!owner && <CardContent className="flex items-center text-sm">
         <div className="flex items-center gap-1">
           <EyeIcon className="w-4 h-4" />
           <span>{viewCount}</span>
         </div>
         <DotIcon className="w-4 h-4" />
-        <span>{DateTime.fromISO(timeAgo).toRelative()}</span>
-      </CardContent>
+        {timeAgo && <span>{DateTime.fromISO(timeAgo).toRelative()}</span>}
+      </CardContent>}
       <CardFooter className="flex justify-end gap-2">
-        <Button variant="outline">
-          <HeartIcon className="w-4 h-4" />
-          <span>{likeCount}</span>
-        </Button>
-        {!claimed ? (
-          <Button asChild>
-            <Link to={`/ideas/${ideaId}/claim`}>Claim idea now &rarr;</Link>
-          </Button>
+        {!claimed && !owner ? (
+          <>
+            <Button variant="outline">
+              <HeartIcon className="w-4 h-4" />
+              <span>{likeCount}</span>
+            </Button>
+            <Button asChild>
+              <Link to={`/ideas/${ideaId}/claim`}>Claim idea now &rarr;</Link>
+            </Button>
+          </>
         ) :  <Button variant="outline" disabled className="cursor-not-allowed">
         <LockIcon className="w-4 h-4" />
         Claimed
