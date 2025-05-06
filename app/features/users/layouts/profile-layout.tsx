@@ -1,4 +1,4 @@
-import { Form, Link, NavLink, Outlet } from 'react-router';
+import { Form, Link, NavLink, Outlet, useOutletContext } from 'react-router';
 import { Avatar, AvatarFallback, AvatarImage } from '~/common/components/ui/avatar';
 import { Badge } from '~/common/components/ui/badge';
 import { Button, buttonVariants } from '~/common/components/ui/button';
@@ -15,7 +15,8 @@ export const loader = async ({params, request} : Route.LoaderArgs & {params: {us
   return {user};
 }
 
-export default function ProfileLayout({loaderData} : Route.ComponentProps) {
+export default function ProfileLayout({loaderData, params} : Route.ComponentProps) {
+  const {isLoggedIn, username} = useOutletContext<{isLoggedIn: boolean, username?: string}>();
   return (
     <div className="space-y-10">
       <div className="flex items-center gap-4">
@@ -26,9 +27,11 @@ export default function ProfileLayout({loaderData} : Route.ComponentProps) {
         <div className="space-y-5">
           <div className="flex gap-2">
             <h1 className="text-2xl font-semibold">{loaderData.user.name}</h1>
-            <Button variant="outline" asChild>
+            {isLoggedIn && username === params.username && <Button variant="outline" asChild>
               <Link to="/my/settings">Edit Profile</Link>
-            </Button>
+            </Button>}
+            {isLoggedIn && username !== params.username &&
+            <>
             <Button variant="secondary">Follow</Button>
             <Dialog>
               <DialogTrigger asChild>
@@ -47,6 +50,7 @@ export default function ProfileLayout({loaderData} : Route.ComponentProps) {
                 </DialogDescription>
               </DialogContent>
             </Dialog>
+            </>}
           </div>
           <div className="flex gap-2 items-center">
             <span className="text-sm text-muted-foreground">{loaderData.user.username}</span>

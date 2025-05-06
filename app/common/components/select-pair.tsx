@@ -11,6 +11,7 @@ export default function SelectPair({
   description, 
   placeholder,
   options,
+  defaultValue,
 } : {
   name: string,
   required?: boolean,
@@ -21,6 +22,7 @@ export default function SelectPair({
     label: string,
     value: string,
   }[],
+  defaultValue?: string,
 })
 {
   const [open, setOpen] = useState(false);
@@ -32,7 +34,7 @@ export default function SelectPair({
           {description}
         </small>
       </Label>
-      <Select open={open} onOpenChange={setOpen} name={name} required={required}>
+      <Select open={open} onOpenChange={setOpen} name={name} required={required} defaultValue={defaultValue}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

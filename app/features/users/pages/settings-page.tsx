@@ -6,6 +6,11 @@ import { useState } from "react";
 import { Label } from "~/common/components/ui/label";
 import { Input } from "~/common/components/ui/input";
 import { Button } from "~/common/components/ui/button";
+import { getLoggedInUserId, getUserById } from "../queries";
+import { makeSSRClient } from "~/supa-client";
+import { z } from "zod";
+import { updateUser } from "../mutations";
+import { Alert, AlertDescription, AlertTitle } from "~/common/components/ui/alert";
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -13,7 +18,34 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-export default function SettingsPage() {
+export const loader = async ({request} : Route.LoaderArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  const user = await getUserById(client, {id: userId});
+  return {user};
+}
+
+const formSchema = z.object({
+  name: z.string().min(3),
+  role: z.string().min(1),
+  headline: z.string().optional().default(""),
+  bio: z.string().optional().default(""),
+});
+
+export const action = async ({request} : Route.ActionArgs) => {
+  const {client, headers} = makeSSRClient(request);
+  const userId = await getLoggedInUserId(client);
+  const formData = await request.formData();
+  const {success, error, data} = formSchema.safeParse(Object.fromEntries(formData));
+  if (!success) {
+    return {fieldErrors: error.flatten().fieldErrors};
+  }
+  const {name, role, headline, bio} = data;
+  await updateUser(client, {id: userId, name, role: role as "developer" | "designer" | "marketer" | "founder" | "product-manager", headline, bio});
+  return {ok: true};
+}
+
+export default function SettingsPage({loaderData, actionData} : Route.ComponentProps) {
   const [avatar, setAvatar] = useState<string | null>(null);
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -25,8 +57,14 @@ export default function SettingsPage() {
     <div className="space-y-20">
       <div className="grid grid-cols-6 gap-40">
         <div className="col-span-4 flex flex-col gap-10">
+          {actionData?.ok && 
+            <Alert>
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>Your profile has been updated</AlertDescription>
+            </Alert>
+          }
           <h2 className="text-2xl font-semibold">Edit Profile</h2>
-          <Form className="flex flex-col w-1/2 gap-5">
+          <Form className="flex flex-col w-1/2 gap-5" method="post">
             <InputPair
               label="Name"
               name="name"
@@ -34,19 +72,26 @@ export default function SettingsPage() {
               placeholder="John Doe"
               description="Your public name"
               required
+              defaultValue={loaderData.user.name}
             />
-            <SelectPair 
+            {actionData?.fieldErrors?.name && <p className="text-red-500">{actionData.fieldErrors.name}</p>}
+
+            <SelectPair
+              defaultValue={loaderData.user.role}
               name="role" 
               label="Role" 
               description="What role do you do identify the most with" 
               placeholder="Select a role" 
               options={[
-                { label: "Software Engineer", value: "software-engineer" },
-                { label: "Product Manager", value: "product-manager" },
+                { label: "Developer", value: "developer" },
                 { label: "Designer", value: "designer" },
-                { label: "Other", value: "other" },
+                { label: "Product Manager", value: "product-manager" },
+                { label: "Marketer", value: "marketer" },
+                { label: "Founder", value: "founder" },
               ]} 
             />
+            {actionData?.fieldErrors?.role && <p className="text-red-500">{actionData.fieldErrors.role}</p>}
+
             <InputPair
               label="Headline"
               name="headline"
@@ -55,7 +100,10 @@ export default function SettingsPage() {
               description="An introduction to your profile"
               required
               textArea
+              defaultValue={loaderData.user.headline ?? ""}
             />
+            {actionData?.fieldErrors?.headline && <p className="text-red-500">{actionData.fieldErrors.headline}</p>}
+
             <InputPair
               label="Bio"
               name="bio"
@@ -64,7 +112,10 @@ export default function SettingsPage() {
               description="Your public bio. It will be displayed on your profile."
               required
               textArea
+              defaultValue={loaderData.user.bio ?? ""}
             />
+            {actionData?.fieldErrors?.bio && <p className="text-red-500">{actionData.fieldErrors.bio}</p>}
+
             <Button className="w-full" type="submit">Update Profile</Button>
           </Form>
         </div>
