@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import type { Route } from './+types/post-page';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '~/common/components/ui/breadcrumb';
-import { Form, Link, useOutletContext } from 'react-router';
+import { Form, Link, useFetcher, useOutletContext } from 'react-router';
 import { Button } from '~/common/components/ui/button';
 import { ChevronUpIcon, DotIcon, MessageCircleIcon } from 'lucide-react';
 import InputPair from '~/common/components/input-pair';
@@ -50,6 +50,7 @@ export const action = async ({request, params} : Route.ActionArgs) => {
 }
 
 export default function PostPage({loaderData, actionData} : Route.ComponentProps) {
+  const fetcher = useFetcher();
   const {post, replies} = loaderData;
   const {isLoggedIn, name, username, avatar} = useOutletContext<{isLoggedIn: boolean, name?: string, username?: string, avatar?: string}>();
   const formRef = useRef<HTMLFormElement>(null);
@@ -84,10 +85,13 @@ export default function PostPage({loaderData, actionData} : Route.ComponentProps
       <div className="grid grid-cols-6 gap-40 items-center">
         <div className="col-span-4 space-y-10">
           <div className="flex w-ull items-start gap-10">
-            <Button variant="outline" className="flex flex-col h-14">
-              <ChevronUpIcon className="size-4 shrink-0" />
-              <span>{post.upvotes}</span>
-            </Button>
+            <fetcher.Form method="post" action={`/community/${loaderData.post.post_id}/upvote`}>
+              <input type="hidden" name="postId" value={loaderData.post.post_id} />
+              <Button variant="outline" className="flex flex-col h-14">
+                <ChevronUpIcon className="size-4 shrink-0" />
+                <span>{post.upvotes}</span>
+              </Button>
+            </fetcher.Form>
             <div className="space-y-20 w-full">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold">{post.title}</h2>
