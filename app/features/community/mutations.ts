@@ -28,3 +28,16 @@ export const createReply = async (client: SupabaseClient<Database>, {postId, rep
     throw error;
   }
 } 
+
+export const toggleUpvote = async (client: SupabaseClient<Database>, {postId, userId}: {postId: number, userId: string}) => {
+  const { count } = await client.from("posts_upvotes").select("*", {count: "exact", head: true}).eq("post_id", postId).eq("profile_id", userId);
+  if (count === 0) {
+    await client.from("posts_upvotes").insert({
+      post_id: postId,
+      profile_id: userId,
+    });
+  } else {
+    await client.from("posts_upvotes").delete().eq("post_id", postId).eq("profile_id", userId);
+  }
+}
+

@@ -30,9 +30,11 @@ export function PostCard({
   isUpvoted = false,
 }: PostCardProps) {
   const fetcher = useFetcher();
+  const optimisitcVotesCount = fetcher.state === "idle" ? votesCount : isUpvoted ? votesCount - 1 : votesCount + 1;
+  const optimisticIsUpvoted = fetcher.state === "idle" ? isUpvoted : !isUpvoted;
   const absorbClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    fetcher.submit({postId: postId}, {
+    fetcher.submit(null, {
       method: "post",
       action: `/community/${postId}/upvote`,
     });
@@ -62,9 +64,9 @@ export function PostCard({
         )}
         {expanded && (
           <CardFooter className="flex justify-end pt-0 bg-0">
-            <Button onClick={absorbClick} variant="outline" className={cn("flex flex-col h-14", isUpvoted ? "border-primary text-primary" : "")}>
+            <Button onClick={absorbClick} variant="outline" className={cn("flex flex-col h-14", optimisticIsUpvoted ? "border-primary text-primary" : "")}>
               <ChevronUpIcon className="size-4 shrink-0" />
-              <span>{votesCount}</span>
+              <span>{optimisitcVotesCount}</span>
             </Button>
           </CardFooter>
         )}
