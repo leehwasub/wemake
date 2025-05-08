@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useFetcher } from "react-router";
 import { Card, CardHeader, CardTitle, CardFooter } from "app/common/components/ui/card";
 import { Button } from "app/common/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "app/common/components/ui/avatar";
@@ -29,6 +29,14 @@ export function PostCard({
   votesCount = 0,
   isUpvoted = false,
 }: PostCardProps) {
+  const fetcher = useFetcher();
+  const absorbClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    fetcher.submit({postId: postId}, {
+      method: "post",
+      action: `/community/${postId}/upvote`,
+    });
+  };
   return (
     <Link to={`/community/${postId}`} className="block">
       <Card className={cn("bg-transparent hover:bg-card/50 transition-colors", expanded ? "flex flex-row items-center justify-between" : "")}>
@@ -54,7 +62,7 @@ export function PostCard({
         )}
         {expanded && (
           <CardFooter className="flex justify-end pt-0 bg-0">
-            <Button variant="outline" className={cn("flex flex-col h-14", isUpvoted ? "border-primary text-primary" : "")}>
+            <Button onClick={absorbClick} variant="outline" className={cn("flex flex-col h-14", isUpvoted ? "border-primary text-primary" : "")}>
               <ChevronUpIcon className="size-4 shrink-0" />
               <span>{votesCount}</span>
             </Button>
