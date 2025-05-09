@@ -17,6 +17,9 @@ export type Database = MergeDeep<SupabaseDatabase, {
             community_post_detail: {
                 Row: SetNonNullable<SupabaseDatabase["public"]["Views"]["community_post_detail"]["Row"]>,
             }
+            messages_view: {
+                Row: SetNonNullable<SupabaseDatabase["public"]["Views"]["messages_view"]["Row"]>,
+            }
         }
     }
 }>

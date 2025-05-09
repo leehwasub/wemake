@@ -96,9 +96,9 @@ export default function TeamPage({loaderData} : Route.ComponentProps) {
           <Form className="space-y-5" method="post" action={`/users/${loaderData.team.team_leader.username}/messages`}>
             <InputPair 
               label="Introduct yourself" 
-              name="introduction"
+              name="content"
               type="text"
-              id="introduction"
+              id="content"
               description="Tell us about yourself" 
               required
               textArea
