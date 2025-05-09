@@ -27,6 +27,7 @@ export default function NotificationsPage({loaderData} : Route.ComponentProps) {
       <div className="flex flex-col items-start gap-5">
         {loaderData.notifications.map((notification) => (
           <NotificationCard
+            notificationId={notification.notification_id}
             key={notification.notification_id}
             avatarSrc={notification.source?.avatar || ""}
             avatarFallback={notification.source?.name?.charAt(0) || ""}

@@ -15,7 +15,7 @@ import Navigation from "./common/components/navigation";
 import { Settings } from "luxon";
 import { cn } from "./lib/utils";
 import { makeSSRClient } from "./supa-client";
-import { getUserById } from "./features/users/queries";
+import { countNotifications, getUserById } from "./features/users/queries";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -56,9 +56,10 @@ export const loader = async ({request}: Route.LoaderArgs) => {
 
   if (user) {
     const profile = await getUserById(client, {id: user.id});
-    return {user, profile};
+    const count = await countNotifications(client, {userId: user.id});
+    return {user, profile, count};
   }
-  return {user: null, profile: null};
+  return {user: null, profile: null, count: 0};
 };
 
 export default function App({loaderData}: Route.ComponentProps) {
@@ -73,7 +74,7 @@ export default function App({loaderData}: Route.ComponentProps) {
         username={loaderData.profile?.username}
         avatar={loaderData.profile?.avatar}
         name={loaderData.profile?.name}
-        hasNotifications={true} 
+        hasNotifications={loaderData.count > 0} 
         hasMessages={true}/>}
       <Outlet context={{ isLoggedIn, name: loaderData.profile?.name, username: loaderData.profile?.username, avatar: loaderData.profile?.avatar}} />
     </div>
