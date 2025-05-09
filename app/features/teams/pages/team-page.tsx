@@ -93,7 +93,7 @@ export default function TeamPage({loaderData} : Route.ComponentProps) {
               <Badge variant="secondary" className="capitalize">{team.team_leader.role}</Badge>
             </div>
           </div>
-          <Form className="space-y-5">
+          <Form className="space-y-5" method="post" action={`/users/${loaderData.team.team_leader.username}/messages`}>
             <InputPair 
               label="Introduct yourself" 
               name="introduction"

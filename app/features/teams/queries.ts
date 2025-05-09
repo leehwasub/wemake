@@ -24,7 +24,8 @@ export const getTeamById = async (client: SupabaseClient<Database>, {teamId} : {
     team_leader:profiles!inner(
       name,
       avatar,
-      role
+      role,
+      username
     )
     `).eq("team_id", teamId).single();
   if (error) {

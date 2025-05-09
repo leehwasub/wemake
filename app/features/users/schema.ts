@@ -57,8 +57,8 @@ export const messageRoomMembers = pgTable("message_room_members", {
 
 export const messages = pgTable("messages", {
   message_id: bigint({mode: "number"}).primaryKey().generatedAlwaysAsIdentity(),
-  message_room_id: bigint({mode: "number"}).references(() => messageRooms.message_room_id, {onDelete: "cascade"}),
-  sender_id: uuid().references(() => profiles.profile_id, {onDelete: "cascade"}),
+  message_room_id: bigint({mode: "number"}).references(() => messageRooms.message_room_id, {onDelete: "cascade"}).notNull(),
+  sender_id: uuid().references(() => profiles.profile_id, {onDelete: "cascade"}).notNull(),
   content: text().notNull(),
   created_at: timestamp().notNull().defaultNow(),
 });
