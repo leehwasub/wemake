@@ -10,3 +10,14 @@ export const claimIdea = async (client: SupabaseClient<Database>, {ideaId, userI
     throw error;
   }
 }
+
+export const insertIdeas = async (client: SupabaseClient<Database>, ideas: string[]) => {
+  const {error} = await client
+  .from("gpt_ideas")
+  .insert(ideas.map((idea) => ({
+    idea,
+  })));
+  if (error) {
+    throw error;
+  }
+}
