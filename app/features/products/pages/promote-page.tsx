@@ -23,10 +23,13 @@ export default function PromotePage() {
     DateTime.fromJSDate(promotionPeriod.to).diff(DateTime.fromJSDate(promotionPeriod.from), "days").days
   : 0;
   const widgets = useRef<TossPaymentsWidgets|null>(null);
+  const initedToss = useRef<boolean>(false);
   useEffect(() => {
     const initToss = async () => {
+      if (initedToss.current) return;
+      initedToss.current = true;
       const toss = await loadTossPayments("test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm");
-      widgets.current = (await toss).widgets({
+      widgets.current = await toss.widgets({
         customerKey: "111111111",
       });
       await widgets.current?.setAmount({
@@ -43,21 +46,45 @@ export default function PromotePage() {
     initToss();
   }, []);
   useEffect(() => {
-    if (widgets.current) {
-      widgets.current.setAmount({
-        value: totalDays * 20000,
-        currency: "KRW",
-      });
+    const updateAmount = async() => {
+      if (widgets.current) {
+        await widgets.current.setAmount({
+          value: totalDays * 20000,
+          currency: "KRW",
+        });
+      }
     }
+    updateAmount();
   }, [promotionPeriod]);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const product = formData.get("product") as string;
+    if (!product || !promotionPeriod?.to || !promotionPeriod?.from) {
+      return;
+    }
+    await widgets.current?.requestPayment({
+      orderId: crypto.randomUUID(),
+      orderName: `WeMake Promotion for ${product}`,
+      customerEmail: "nico@nomadcoders.co",
+      customerName: "Nico",
+      metadata: {
+        product,
+        promotionFrom: DateTime.fromJSDate(promotionPeriod.from).toISO(),
+        promotionTo: DateTime.fromJSDate(promotionPeriod.to).toISO(),
+      },
+      successUrl: `${window.location.href}/success`,
+      failUrl: `${window.location.href}/fail`,
+    });
+  }
   return (
     <div className="space-y-10">
       <Hero 
         title="Promote Your Product" 
         subtitle="Boost your product visibility and drive more traffic with our promotion services." 
       />
-      <div className="grid grid-cols-6 gap-10">
-        <Form className="col-span-3 mx-auto w-1/2 flex flex-col gap-10 items-start">
+      <form onSubmit={handleSubmit} className="grid grid-cols-6 gap-10">
+        <div className="col-span-3 mx-auto w-1/2 flex flex-col gap-10 items-start">
           <SelectPair 
             name="product"
             label="Select a Promotion Type"
@@ -87,7 +114,7 @@ export default function PromotePage() {
               disabled={{before: new Date()}}
             />
           </div>
-        </Form>
+        </div>
         <aside className="col-span-3 px-20 flex flex-col gap-10 items-center">
           <div id="toss-payment-methods" className="w-full" />
           <div id="toss-payment-agreement" />
@@ -95,7 +122,7 @@ export default function PromotePage() {
             Go to checkout ({(totalDays * 20000).toLocaleString("ko-KR", {style: "currency", currency: "KRW"})})
           </Button>
         </aside>
-     </div>
+     </form>
     </div>
   );
 } 
