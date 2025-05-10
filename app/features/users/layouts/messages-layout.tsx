@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, useOutletContext } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "~/common/components/ui/avatar";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "~/common/components/ui/sidebar";
 import { MessagesCard } from "../components/messages-card";
@@ -14,6 +14,7 @@ export const loader = async ({request}: Route.LoaderArgs) => {
 }
 
 export default function MessagesLayout({loaderData}: Route.ComponentProps) {
+  const {userId} = useOutletContext<{userId: string}>();
   return (
     <SidebarProvider className="max-h-[calc(100vh-14rem)] h-[calc(100vh-14rem)] overflow-hidden min-h-full">
       <Sidebar className="pt-16" variant="floating">
@@ -35,7 +36,7 @@ export default function MessagesLayout({loaderData}: Route.ComponentProps) {
         </SidebarContent>
       </Sidebar>
       <div className="h-full w-full">
-        <Outlet />
+        <Outlet context= {{userId}}/>
       </div>
     </SidebarProvider>
   );

@@ -76,7 +76,7 @@ export default function App({loaderData}: Route.ComponentProps) {
         name={loaderData.profile?.name}
         hasNotifications={loaderData.count > 0} 
         hasMessages={true}/>}
-      <Outlet context={{ isLoggedIn, name: loaderData.profile?.name, username: loaderData.profile?.username, avatar: loaderData.profile?.avatar}} />
+      <Outlet context={{ isLoggedIn, name: loaderData.profile?.name, userId: loaderData.user?.id, username: loaderData.profile?.username, avatar: loaderData.profile?.avatar}} />
     </div>
   );
 }

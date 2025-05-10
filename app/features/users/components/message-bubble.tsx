@@ -15,12 +15,12 @@ export function MessageBubble({
   isCurrentUser = false,
 }: MessagesBubbleProps) {
   return (
-    <div className={cn("flex items-end gap-4", isCurrentUser ? "flex-row-reverse" : "")}>
+    <div className={cn("flex items-end gap-4", isCurrentUser ? "" : "flex-row-reverse")}>
       <Avatar>
         <AvatarImage src={avatarSrc} />
         <AvatarFallback>{avatarFallback}</AvatarFallback>
       </Avatar>
-      <div className={cn("rounded-md p-4 text-sm w-1/4", isCurrentUser ? "bg-accent rounded-br-none" : "bg-primary text-primary-foreground rounded-bl-none")}>
+      <div className={cn("rounded-md p-4 text-sm w-1/4", isCurrentUser ? "bg-primary text-primary-foreground rounded-bl-none" : "bg-accent rounded-br-none")}>
         <p>{message}</p>
       </div>
     </div>
