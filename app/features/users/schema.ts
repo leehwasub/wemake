@@ -1,6 +1,8 @@
-import { bigint, boolean, jsonb, pgEnum, pgSchema, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { bigint, boolean, jsonb, pgEnum, pgPolicy, pgSchema, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { authenticatedRole, authUid, serviceRole } from "drizzle-orm/supabase"; 
 import { products } from "../products/schema";
 import { posts } from "../community/schema";
+import { sql } from "drizzle-orm";
 
 export const users = pgSchema("auth").table("users", {
   id: uuid().primaryKey()
@@ -63,4 +65,24 @@ export const messages = pgTable("messages", {
   created_at: timestamp().notNull().defaultNow(),
 });
 
+export const todos = pgTable("todos", {
+  todo_id: bigint({mode: "number"}).primaryKey().generatedAlwaysAsIdentity(),
+  title: text().notNull(),
+  completed: boolean().notNull().default(false),
+  created_at: timestamp().notNull().defaultNow(),
+  profile_id: uuid().references(() => profiles.profile_id, {onDelete: "cascade"}).notNull(),
+}, (table) => [
+  pgPolicy("todos-insert-policy", {
+    for: "insert",
+    to: authenticatedRole,
+    as: "permissive",
+    withCheck: sql`${authUid} = ${table.profile_id}`,
+  }),
+  pgPolicy("todos-select-policy", {
+    for: "select",
+    to: authenticatedRole,
+    as: "permissive",
+    using: sql`${authUid} = ${table.profile_id}`,
+  })
+]);
 
